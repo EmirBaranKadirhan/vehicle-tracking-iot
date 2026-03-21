@@ -8,8 +8,16 @@ const startBroker = async () => {
     const aedes = await Aedes.createBroker()
     const httpServer = createServer(aedes, { ws: true })
 
-    httpServer.listen(port, function () {
-        console.log('websocket server listening on port ', port)
+    aedes.on('client', (client) => {
+        console.log('Client bağlandı:', client.id)
+    })
+
+    aedes.on('clientDisconnect', (client) => {
+        console.log('Client ayrıldı:', client.id)
+    })
+
+    httpServer.listen(port, () => {
+        console.log(`MQTT broker ${port} portunda çalışıyor`)
     })
 
 
