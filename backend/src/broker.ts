@@ -20,6 +20,9 @@ const startBroker = async () => {
         console.log(`MQTT broker ${port} portunda çalışıyor`)
     })
 
+    aedes.on('publish', (packet, client) => {
+        console.log('Mesaj geldi:', packet.topic, packet.payload.toString())
+    })
 
 }
 
