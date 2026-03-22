@@ -1,3 +1,4 @@
+// import { redis } from './redis'
 import './broker'
 import express from 'express'
 import dotenv from 'dotenv'
@@ -13,8 +14,10 @@ app.use(cors())
 const PORT = process.env.PORT || 5000
 
 
-app.listen(PORT, () => {
-
+app.listen(PORT, async () => {
+    // await redis.set('test', 'merhaba')
+    // const value = await redis.get('test')
+    // console.log('Redis test:', value)
     console.log(`Server ${PORT} portunda çalışıyor`)
 
 })
