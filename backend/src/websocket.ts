@@ -5,6 +5,7 @@ export const wss = new WebSocketServer({ port: 8080 });    // websocket server, 
 export const clients = new Set<WebSocket>()        // bagli olan frontend'lerin listesi 
 
 wss.on('connection', (ws) => {
+    console.log('Frontend bağlandı')
     ws.on('error', console.error);
     clients.add(ws)
 
@@ -12,3 +13,8 @@ wss.on('connection', (ws) => {
         clients.delete(ws)
     })
 });
+
+
+wss.on('listening', () => {
+    console.log('WebSocket server 8080 portunda çalışıyor')
+})
