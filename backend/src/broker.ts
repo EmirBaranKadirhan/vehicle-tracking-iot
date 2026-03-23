@@ -1,6 +1,8 @@
 import { Aedes } from 'aedes'
 import { createServer } from 'aedes-server-factory'
 import { redis } from './redis'
+import { clients } from './websocket'
+
 const port = 8888
 
 
@@ -27,6 +29,9 @@ const startBroker = async () => {
             const data = packet.payload.toString()
             const objectData = JSON.parse(data)
             await redis.set('vehicle:1:location', JSON.stringify(objectData));
+            clients.forEach((client) => {
+                client.send(JSON.stringify(objectData))
+            })
         }
 
     })
