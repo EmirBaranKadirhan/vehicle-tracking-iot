@@ -2,6 +2,7 @@ import { Aedes } from 'aedes'
 import { createServer } from 'aedes-server-factory'
 import { redis } from './redis'
 import { clients } from './websocket'
+import History from './models/LocationHistory'
 
 const port = 8888
 
@@ -33,6 +34,15 @@ const startBroker = async () => {
             const data = packet.payload.toString()
             const objectData = JSON.parse(data)
             await redis.set(`vehicle:${id}:location`, JSON.stringify(objectData));
+
+            await History.create({
+                vehicleId: id as string,
+                lat: objectData.lat,
+                long: objectData.long,
+                speed: objectData.speed,
+                direction: objectData.direction,
+                altitude: objectData.altitude
+            })
 
             clients.forEach((client) => {
                 client.send(JSON.stringify({ id, ...objectData }))
