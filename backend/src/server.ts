@@ -4,6 +4,7 @@ import express from 'express'
 import dotenv from 'dotenv'
 import cors from 'cors'
 import './websocket'
+import connectDB from './db'
 
 dotenv.config()
 
@@ -19,6 +20,8 @@ app.listen(PORT, async () => {
     // await redis.set('test', 'merhaba')
     // const value = await redis.get('test')
     // console.log('Redis test:', value)
+    await connectDB()
     console.log(`Server ${PORT} portunda çalışıyor`)
+
 
 })
