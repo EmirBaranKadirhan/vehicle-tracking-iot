@@ -25,12 +25,17 @@ const startBroker = async () => {
     // client ==> mesaji gonderen client
     aedes.on('publish', async (packet, client) => {   // packet ==> gelen mesajin kendisi, icinde topic ve payload var
         console.log('Mesaj geldi:', packet.topic, packet.payload.toString())
-        if (packet.topic === 'vehicle/1/location') {
+
+        if (packet.topic.startsWith('vehicle/')) {     // startsWith ==> bir stringin belirtilen seyle baslayip baslamadigini kontrol ederiz (true,false)
+            // vehicle/1/location
+            const parts = packet.topic.split("/")
+            const id = parts[1]
             const data = packet.payload.toString()
             const objectData = JSON.parse(data)
-            await redis.set('vehicle:1:location', JSON.stringify(objectData));
+            await redis.set(`vehicle:${id}:location`, JSON.stringify(objectData));
+
             clients.forEach((client) => {
-                client.send(JSON.stringify(objectData))
+                client.send(JSON.stringify({ id, ...objectData }))
             })
         }
 
