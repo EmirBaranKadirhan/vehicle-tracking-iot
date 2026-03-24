@@ -5,6 +5,7 @@ import dotenv from 'dotenv'
 import cors from 'cors'
 import './websocket'
 import connectDB from './db'
+import historyRouter from './routes/history'
 
 dotenv.config()
 
@@ -12,6 +13,8 @@ const app = express()
 app.use(express.json())
 app.use(cors())
 
+
+app.use('/api', historyRouter)
 
 const PORT = process.env.PORT || 5000
 
