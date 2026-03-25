@@ -1,19 +1,13 @@
 import React, { useEffect, useState } from 'react'
-import type { IGPSData, ILocationHistory } from '../types/gps'
+import type { IGPSData } from '../types/gps'
 import { MapContainer, TileLayer, Marker } from 'react-leaflet'
 import L from 'leaflet'
 import { useNavigate } from 'react-router'
-
-const VEHICLE_COLORS: Record<string, { color: string; label: string }> = {
-    '1': { color: '#06b6d4', label: 'Alpha-1' },
-    '2': { color: '#a855f7', label: 'Alpha-2' },
-    '3': { color: '#f59e0b', label: 'Alpha-3' },
-}
+import { VEHICLE_COLORS } from '../constants/vehicles'
 
 export default function Dashboard() {
     const [vehicles, setVehicles] = useState<Record<string, IGPSData>>({})
-    const [liveLog, setLiveLog] = useState<Array<IGPSData & { id: string }>>([])
-    const [historyLog, setHistoryLog] = useState<ILocationHistory[]>([])
+    const [liveLog, setLiveLog] = useState<Array<IGPSData & { id: string }>>([])    //  & ==>  intersection type — iki tipi birleştir, websocket'den gelen veride "id" degeri var fakat tanimli olan IGPSData'da id degeri yok !!!
     const navigate = useNavigate()
 
     useEffect(() => {

@@ -2,12 +2,8 @@ import React, { useEffect, useState } from 'react'
 import { getHistory } from '../api/history'
 import type { ILocationHistory } from '../types/gps'
 import { useNavigate } from 'react-router'
+import { VEHICLE_COLORS } from '../constants/vehicles'
 
-const VEHICLE_COLORS: Record<string, { color: string; label: string }> = {
-    '1': { color: '#06b6d4', label: 'Alpha-1' },
-    '2': { color: '#a855f7', label: 'Alpha-2' },
-    '3': { color: '#f59e0b', label: 'Alpha-3' },
-}
 
 export default function HistoryPage() {
     const [data, setData] = useState<ILocationHistory[]>([])
@@ -39,12 +35,12 @@ export default function HistoryPage() {
             <div className="p-8 space-y-6">
                 <header>
                     <h2 className="text-4xl font-['Space_Grotesk'] font-bold tracking-tight">Location History</h2>
-                    <p className="text-slate-400">Son <span className="text-cyan-400 font-bold">{data.length} kayıt</span> — MongoDB Atlas</p>
+                    <p className="text-slate-400">Last <span className="text-cyan-400 font-bold">{data.length} records</span></p>
                 </header>
 
                 <section className="bg-[#131b2e] rounded-2xl overflow-hidden border border-white/5">
                     <div className="p-6 border-b border-white/5 flex justify-between">
-                        <h3 className="font-bold uppercase tracking-widest text-xs">Geçmiş Kayıtlar</h3>
+                        <h3 className="font-bold uppercase tracking-widest text-xs">Last Records</h3>
                         <span className="text-[10px] text-slate-500">GET /api/history</span>
                     </div>
                     <table className="w-full text-left text-sm">
