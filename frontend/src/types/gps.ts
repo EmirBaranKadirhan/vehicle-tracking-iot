@@ -5,3 +5,10 @@ export interface IGPSData {
     direction: number
     altitude: number
 }
+
+
+export interface ILocationHistory extends IGPSData {
+    _id: string
+    vehicleId: string
+    createdAt: string
+}
