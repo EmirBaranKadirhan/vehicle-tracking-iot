@@ -7,15 +7,16 @@ import { VEHICLE_COLORS } from '../constants/vehicles'
 
 export default function HistoryPage() {
     const [data, setData] = useState<ILocationHistory[]>([])
+    const [selectedVehicle, setSelectedVehicle] = useState<string | undefined>(undefined)
     const navigate = useNavigate()
 
     useEffect(() => {
         const fetchData = async () => {
-            const res = await getHistory()
+            const res = await getHistory(selectedVehicle)
             setData(res)
         }
         fetchData()
-    }, [])
+    }, [selectedVehicle])
 
     return (
         <div className="min-h-screen bg-[#0b1326] text-[#dae2fd] font-['Inter']">
@@ -37,6 +38,36 @@ export default function HistoryPage() {
                     <h2 className="text-4xl font-['Space_Grotesk'] font-bold tracking-tight">Location History</h2>
                     <p className="text-slate-400">Last <span className="text-cyan-400 font-bold">{data.length} records</span></p>
                 </header>
+
+                {/* Filtre Butonları */}
+                <div className="flex gap-3 flex-wrap">
+
+                    {/* ALL butonu — selectedVehicle undefined olunca aktif */}
+                    <button
+                        onClick={() => setSelectedVehicle(undefined)}
+                        className={`px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-widest transition-all ${selectedVehicle === undefined
+                                ? 'bg-cyan-500/20 text-cyan-400 border border-cyan-500'
+                                : 'bg-white/5 text-slate-400 border border-white/10 hover:bg-white/10'
+                            }`}
+                    >
+                        All Vehicles
+                    </button>
+
+                    {/* VEHICLE_COLORS'tan map — her araç için bir buton */}
+                    {Object.entries(VEHICLE_COLORS).map(([id, info]) => (
+                        <button
+                            key={id}
+                            onClick={() => setSelectedVehicle(id)}
+                            className={`px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-widest transition-all ${selectedVehicle === id
+                                    ? 'bg-white/10 border'
+                                    : 'bg-white/5 text-slate-400 border border-white/10 hover:bg-white/10'
+                                }`}
+                            style={selectedVehicle === id ? { color: info.color, borderColor: info.color } : {}}
+                        >
+                            {info.label}
+                        </button>
+                    ))}
+                </div>
 
                 <section className="bg-[#131b2e] rounded-2xl overflow-hidden border border-white/5">
                     <div className="p-6 border-b border-white/5 flex justify-between">
