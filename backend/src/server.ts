@@ -7,6 +7,7 @@ import './websocket'
 import connectDB from './db'
 import historyRouter from './routes/history'
 import authRouter from './routes/auth'
+import { authenticateToken } from './middleware/authMiddleware'
 
 dotenv.config()
 
@@ -16,7 +17,7 @@ app.use(cors())
 
 
 app.use('/api/auth', authRouter)
-app.use('/api', historyRouter)
+app.use('/api', authenticateToken, historyRouter)
 
 
 const PORT = process.env.PORT || 5000

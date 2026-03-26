@@ -13,7 +13,7 @@ export function authenticateToken(req: any, res: Response, next: NextFunction) {
             return res.status(401).json({ message: 'Token Bulunamadi' });
         }
 
-        const verified = jwt.verify(token, process.env.JWT_SECRET!) as { userId: string }
+        const verified = jwt.verify(token, process.env.JWT_SECRET_KEY) as { userId: string }
 
         req.userId = verified.userId;
         next();
