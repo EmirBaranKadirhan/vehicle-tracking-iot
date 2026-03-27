@@ -22,4 +22,13 @@ instance.interceptors.response.use(                         // api'den donen res
 )
 
 
+instance.interceptors.request.use((config) => {       // token'i Authorization header'a koyup backend' e istek atariz, backend JWT'yi okur ==> bu token gecerli mi ya da suresi dolmus mu diye sonra duruma gore cevap dondurur!!
+    const token = localStorage.getItem("token")
+    if (token) {
+        config.headers.Authorization = `Bearer ${token}`
+    }
+    return config
+})
+
+
 export default instance
