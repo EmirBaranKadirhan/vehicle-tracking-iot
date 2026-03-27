@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { login } from '../api/auth'
-import { useNavigate } from "react-router";
+import { useNavigate, Link } from "react-router";
 import axios from 'axios'
 
 
@@ -119,7 +119,7 @@ export default function LoginPage() {
                     <div className="mt-8 pt-8 border-t border-white/5 text-center">
                         <p className="text-sm text-slate-400">
                             Hesabınız yok mu?
-                            <a className="text-cyan-400 font-semibold hover:underline underline-offset-4 ml-1" href="#">Kayıt Ol</a>
+                            <Link to="/register" className="text-cyan-400 font-semibold hover:underline underline-offset-4 ml-1">Kayıt Ol</Link>
                         </p>
                     </div>
                 </div>
