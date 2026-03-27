@@ -10,6 +10,13 @@ export default function Dashboard() {
     const [liveLog, setLiveLog] = useState<Array<IGPSData & { id: string }>>([])    //  & ==>  intersection type — iki tipi birleştir, websocket'den gelen veride "id" degeri var fakat tanimli olan IGPSData'da id degeri yok !!!
     const navigate = useNavigate()
 
+    const handleLogout = () => {
+
+        localStorage.removeItem("token")
+        navigate("/login")
+
+    }
+
     useEffect(() => {
         const socket = new WebSocket('ws://localhost:8080')
         socket.onmessage = (event) => {
@@ -56,6 +63,9 @@ export default function Dashboard() {
                     <NavItem icon="map" label="Live Map" onClick={() => navigate('/')} />
                     <NavItem icon="history" label="Historical" onClick={() => navigate('/historical')} />
                 </nav>
+                <div className="mt-auto">
+                    <NavItem icon="logout" label="Çıkış Yap" onClick={handleLogout} />
+                </div>
             </aside>
 
             {/* buradan aşağısı hiç değişmedi, aynen bıraktım */}
