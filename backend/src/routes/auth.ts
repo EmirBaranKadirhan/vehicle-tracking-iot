@@ -32,7 +32,12 @@ router.post('/register', async (req, res) => {
                 password: hashedPassword
             })
 
-            return res.status(201).json({ message: "Kayit Basarili", userRegister })
+            const secret = process.env.JWT_SECRET_KEY
+            const token = jwt.sign({ userId: userRegister._id }, secret, {
+                expiresIn: '30m'
+            })
+
+            return res.status(201).json({ message: "Kayit Basarili", token })
         }
 
         return res.status(400).json({ message: "Kayit Basarisiz Kayitli Kullanici" })
