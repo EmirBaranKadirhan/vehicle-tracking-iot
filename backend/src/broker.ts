@@ -3,6 +3,7 @@ import { createServer } from 'aedes-server-factory'
 import { redis } from './redis'
 import { clients } from './websocket'
 import History from './models/LocationHistory'
+import Alert from './models/Alerts'
 
 const port = 8888
 
@@ -43,6 +44,15 @@ const startBroker = async () => {
                 direction: objectData.direction,
                 altitude: objectData.altitude
             })
+
+            if (objectData.speed > 90) {
+                await Alert.create({
+                    vehicleId: id as string,
+                    type: "speed_violation",
+                    message: `Vehicle ${id} exceeded speed limit: ${objectData.speed} km/h`,
+                    speed: objectData.speed
+                })
+            }
 
             clients.forEach((client) => {
                 client.send(JSON.stringify({ id, ...objectData }))
