@@ -55,9 +55,15 @@ const startBroker = async () => {
                 })
             }
 
-            clients.forEach((client) => {
-                client.send(JSON.stringify({ id, ...objectData }))
-            })
+            const idle = await redis.get(`vehicle:${id}:idleSince`);
+            if (objectData.speed === 0 && !idle) {
+                await redis.set(`vehicle:${id}:idleSince`, Date.now().toString());
+            } else if (objectData.speed > 0)
+
+
+                clients.forEach((client) => {
+                    client.send(JSON.stringify({ id, ...objectData }))
+                })
         }
 
     })
@@ -69,8 +75,8 @@ setInterval(async () => {
 
     for (const id of vehicleIds) {
         // lastSeen'i Redis'ten oku
-        const value = await redis.get(`vehicle:${id}:lastSeen`);
-        const diff = Date.now() - Number(value)
+        const lastSeen = await redis.get(`vehicle:${id}:lastSeen`);
+        const diff = Date.now() - Number(lastSeen)
 
         if (diff > 5 * (60 * 1000)) {
 
@@ -78,11 +84,22 @@ setInterval(async () => {
                 vehicleId: id as string,
                 type: "offline",
                 message: `Vehicle ${id} has been offline for more than 5 minutes`
-
             })
         }
-        // şu anki zamanla karşılaştır
-        // 5 dakikadan eskiyse Alert.create()
+
+        const idleTime = await redis.get(`vehicle:${id}:idleSince`);
+        if (idleTime) {
+            const idleDiff = Date.now() - Number(idleTime)
+            if (idleDiff > (3 * 60 * 1000)) {
+                Alert.create({
+                    vehicleId: id as string,
+                    type: "idle",
+                    message: `Vehicle ${id} has been idle for more than 3 minutes`
+                })
+            }
+        }
+
+
     }
 }, 60000) // her dakika
 
