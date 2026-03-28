@@ -35,6 +35,7 @@ const startBroker = async () => {
             const data = packet.payload.toString()
             const objectData = JSON.parse(data)
             await redis.set(`vehicle:${id}:location`, JSON.stringify(objectData));
+            await redis.set(`vehicle:${id}:lastSeen`, Date.now().toString());
 
             await History.create({
                 vehicleId: id as string,
@@ -62,6 +63,28 @@ const startBroker = async () => {
     })
 
 }
+
+setInterval(async () => {
+    const vehicleIds = ['1', '2', '3']
+
+    for (const id of vehicleIds) {
+        // lastSeen'i Redis'ten oku
+        const value = await redis.get(`vehicle:${id}:lastSeen`);
+        const diff = Date.now() - Number(value)
+
+        if (diff > 5 * (60 * 1000)) {
+
+            Alert.create({
+                vehicleId: id as string,
+                type: "offline",
+                message: `Vehicle ${id} has been offline for more than 5 minutes`
+
+            })
+        }
+        // şu anki zamanla karşılaştır
+        // 5 dakikadan eskiyse Alert.create()
+    }
+}, 60000) // her dakika
 
 
 startBroker()
