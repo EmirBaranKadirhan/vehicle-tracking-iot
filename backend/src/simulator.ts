@@ -18,23 +18,33 @@ client.on('connect', () => {
     console.log('connected!')
 
     const vehicles = [
-        { id: 1, lastLat: 39.6484, lastLng: 27.8826 },
-        { id: 2, lastLat: 39.6510, lastLng: 27.8900 },
-        { id: 3, lastLat: 39.6450, lastLng: 27.8750 },
+        { id: 1, lastLat: 39.3194, lastLng: 26.6961, lastSpeed: 60, dirLat: 0.5, dirLng: 0.5, lastDirection: 45 },   // Ayvalık merkez
+        { id: 2, lastLat: 36.8121, lastLng: 34.6415, lastSpeed: 60, dirLat: 0.5, dirLng: -0.5, lastDirection: 135 },   // Mersin merkez
+        { id: 3, lastLat: 38.4237, lastLng: 27.1428, lastSpeed: 60, dirLat: -0.5, dirLng: 0.5, lastDirection: 270 },   // İzmir merkez
     ]
 
     setInterval(() => {
 
         vehicles.forEach((vehicle) => {
 
-            const lat = vehicle.lastLat + (Math.random() - 0.5) * 0.0002;
-            const lng = vehicle.lastLng + (Math.random() - 0.5) * 0.0002;
-            const vehicleSpeed = Math.floor(Math.random() * 121)
-            const vehicleDirection = Math.floor(Math.random() * 361)
+            // Math.floor(Math.random() * (max - min)) + min   ||  Math.min(120, Math.max(0, yeniHiz)       ==> alt satirda surat guncellemede kullanilan formuller !!!
+            const vehicleSpeed = Math.floor(Math.min(120, Math.max(0, vehicle.lastSpeed + Math.floor(Math.random() * 20) + (-10))))
+
+            const lat = vehicle.lastLat + vehicle.dirLat * vehicleSpeed * 0.000001
+            const lng = vehicle.lastLng + vehicle.dirLng * vehicleSpeed * 0.000001
+
+            const vehicleDirection = (vehicle.lastDirection + Math.floor(Math.random() * 6) + (-3) + 360) % 360       // +360 her zaman negatife düşmeyi engeller. % 360 ise 360'ı geçince başa döndürür
+
             const vehicleAltitude = Math.floor(Math.random() * 51) + 100;
 
             vehicle.lastLat = lat
             vehicle.lastLng = lng
+            vehicle.lastSpeed = vehicleSpeed
+            vehicle.lastDirection = vehicleDirection
+
+            const radyan = (vehicleDirection * Math.PI) / 180       // bilgisayar dereceyle calismayi bilmediklerinden onlara "Radyan" seklinde veri veririz! Formulu de yandaki gibi
+            vehicle.dirLat = Math.sin(radyan) * 0.5
+            vehicle.dirLng = Math.cos(radyan) * 0.5
 
             const data: IGPSData = {
                 lat: lat,
