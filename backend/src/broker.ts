@@ -47,23 +47,29 @@ const startBroker = async () => {
             })
 
             if (objectData.speed > 90) {
-                await Alert.create({
-                    vehicleId: id as string,
-                    type: "speed_violation",
-                    message: `Vehicle ${id} exceeded speed limit: ${objectData.speed} km/h`,
-                    speed: objectData.speed
-                })
+                const cooldown = await redis.get(`vehicle:${id}:cooldown:speed_violation`)      // Cooldown — aynı araç için 300sn içinde tekrar alert üretmeyi engeller
+                if (!cooldown) {
+                    await Alert.create({
+                        vehicleId: id as string,
+                        type: "speed_violation",
+                        message: `Vehicle ${id} exceeded speed limit: ${objectData.speed} km/h`,
+                        speed: objectData.speed
+                    })
+                    await redis.set(`vehicle:${id}:cooldown:speed_violation`, 'locked', 'EX', 300)      // redis.set(key, value, 'EX', saniye) → TTL sonunda otomatik silinir
+                }
             }
 
             const idle = await redis.get(`vehicle:${id}:idleSince`);
             if (objectData.speed === 0 && !idle) {
                 await redis.set(`vehicle:${id}:idleSince`, Date.now().toString());
-            } else if (objectData.speed > 0)
+            } else if (objectData.speed > 0) {
+                await redis.del(`vehicle:${id}:idleSince`)
+            }
 
 
-                clients.forEach((client) => {
-                    client.send(JSON.stringify({ id, ...objectData }))
-                })
+            clients.forEach((client) => {
+                client.send(JSON.stringify({ id, ...objectData }))
+            })
         }
 
     })
@@ -79,27 +85,34 @@ setInterval(async () => {
         const diff = Date.now() - Number(lastSeen)
 
         if (diff > 5 * (60 * 1000)) {
+            const cooldown = await redis.get(`vehicle:${id}:cooldown:offline`)
+            if (!cooldown) {
+                Alert.create({
+                    vehicleId: id as string,
+                    type: "offline",
+                    message: `Vehicle ${id} has been offline for more than 5 minutes`
+                })
+                await redis.set(`vehicle:${id}:cooldown:offline`, 'locked', 'EX', 300)
+            }
 
-            Alert.create({
-                vehicleId: id as string,
-                type: "offline",
-                message: `Vehicle ${id} has been offline for more than 5 minutes`
-            })
         }
 
         const idleTime = await redis.get(`vehicle:${id}:idleSince`);
         if (idleTime) {
             const idleDiff = Date.now() - Number(idleTime)
             if (idleDiff > (3 * 60 * 1000)) {
-                Alert.create({
-                    vehicleId: id as string,
-                    type: "idle",
-                    message: `Vehicle ${id} has been idle for more than 3 minutes`
-                })
+                const cooldown = await redis.get(`vehicle:${id}:cooldown:idle`)
+                if (!cooldown) {
+                    Alert.create({
+                        vehicleId: id as string,
+                        type: "idle",
+                        message: `Vehicle ${id} has been idle for more than 3 minutes`
+                    })
+                    await redis.set(`vehicle:${id}:cooldown:idle`, 'locked', 'EX', 300)
+                }
+
             }
         }
-
-
     }
 }, 60000) // her dakika
 
