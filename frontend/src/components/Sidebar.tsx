@@ -17,8 +17,8 @@ function NavItem({ icon, label, active = false, onClick }: {
         <div
             onClick={onClick}
             className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all cursor-pointer ${active
-                    ? 'bg-cyan-500/10 text-cyan-400 border-l-4 border-cyan-500'
-                    : 'text-slate-400 hover:bg-white/5'
+                ? 'bg-cyan-500/10 text-cyan-400 border-l-4 border-cyan-500'
+                : 'text-slate-400 hover:bg-white/5'
                 }`}
         >
             <span className="material-symbols-outlined">{icon}</span>
@@ -72,9 +72,9 @@ export default function Sidebar({ vehicles = {} }: SidebarProps) {
             {/* Nav */}
             <nav className="space-y-2">
                 <NavItem icon="dashboard" label="Dashboard" active={location.pathname === '/'} onClick={() => navigate('/')} />
-                <NavItem icon="map" label="Live Map" onClick={() => navigate('/')} />
                 <NavItem icon="history" label="Historical" active={location.pathname === '/historical'} onClick={() => navigate('/historical')} />
                 <NavItem icon="warning" label="Alerts" active={location.pathname === '/alerts'} onClick={() => navigate('/alerts')} />
+                <NavItem icon="analytics" label="Analytics" active={location.pathname === '/analytics'} onClick={() => navigate('/analytics')} />
             </nav>
 
             {/* Logout */}
