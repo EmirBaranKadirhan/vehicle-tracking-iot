@@ -2,16 +2,9 @@ import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router'
 import instance from '../api/client'
 import Sidebar from '../components/Sidebar'
+import type { IAlert } from '../types/alert'
 
 
-interface IAlert {
-    _id: string
-    vehicleId: string
-    type: 'speed_violation' | 'offline' | 'idle'
-    message: string
-    speed?: number
-    createdAt: string
-}
 
 const VEHICLE_LABELS: Record<string, string> = {
     '1': 'Alpha — Ayvalık',
@@ -47,15 +40,33 @@ export default function AlertsPage() {
     const [alerts, setAlerts] = useState<IAlert[]>([])
     const [filter, setFilter] = useState<string>('all')
     const [loading, setLoading] = useState(true)
+    const [page, setPage] = useState(1)
+    const [limit] = useState(10)            // limit hep sabit kalacagi icin "set" kullanmadik !!
+    const [total, setTotal] = useState(0)
+    const [typeCounts, setTypeCounts] = useState({
+        speed_violation: 0,
+        offline: 0,
+        idle: 0,
+    })
+
     const navigate = useNavigate()
 
     useEffect(() => {
         const fetchAlerts = async () => {
             setLoading(true)
             try {
-                const params = filter !== 'all' ? `?type=${filter}` : ''
+                const params = filter !== 'all' ? `?type=${filter}&page=${page}&limit=${limit}` : `?page=${page}&limit=${limit}`    // sayfa baslar baslamaz yukaridaki state degerlerini alirlar
                 const { data } = await instance.get(`/api/alerts${params}`)
                 setAlerts(data.response)
+                setTotal(data.total)
+
+                // const { speedViolationCounts, offlineCounts, idleCounts } = data
+                setTypeCounts({
+                    speed_violation: data.speedViolationCounts,
+                    offline: data.offlineCounts,
+                    idle: data.idleCounts,
+                })
+
             } catch (err) {
                 console.error(err)
             } finally {
@@ -63,13 +74,8 @@ export default function AlertsPage() {
             }
         }
         fetchAlerts()
-    }, [filter])
+    }, [filter, page])
 
-    const counts = {
-        speed_violation: alerts.filter(a => a.type === 'speed_violation').length,
-        offline: alerts.filter(a => a.type === 'offline').length,
-        idle: alerts.filter(a => a.type === 'idle').length,
-    }
 
     const handleLogout = () => {
         localStorage.removeItem('token')
@@ -96,9 +102,9 @@ export default function AlertsPage() {
                     {/* Stat Cards */}
                     <div className="flex gap-3">
                         {[
-                            { label: 'Hız İhlali', count: counts.speed_violation, color: '#ff4d6d' },
-                            { label: 'Offline', count: counts.offline, color: '#facc15' },
-                            { label: 'Hareketsiz', count: counts.idle, color: '#4cd7f6' },
+                            { label: 'Hız İhlali', count: typeCounts.speed_violation, color: '#ff4d6d' },
+                            { label: 'Offline', count: typeCounts.offline, color: '#facc15' },
+                            { label: 'Hareketsiz', count: typeCounts.idle, color: '#4cd7f6' },
                         ].map((stat) => (
                             <div
                                 key={stat.label}
@@ -127,7 +133,10 @@ export default function AlertsPage() {
                     ].map((tab) => (
                         <button
                             key={tab.value}
-                            onClick={() => setFilter(tab.value)}
+                            onClick={() => {
+                                setFilter(tab.value)
+                                setPage(1)              // filter degistiginde buranin da sifirlanmasi lazim
+                            }}
                             className={`px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-widest font-['Space_Grotesk'] transition-all ${filter === tab.value
                                 ? 'bg-cyan-500/20 text-cyan-400 border border-cyan-500'
                                 : 'bg-white/5 text-slate-400 border border-white/10 hover:bg-white/10'
@@ -190,6 +199,80 @@ export default function AlertsPage() {
                     })}
                 </div>
 
+                {/* Pagination */}
+                {total > limit && (
+                    <div className="flex items-center justify-between py-4">
+                        <p className="text-[11px] text-slate-500 uppercase tracking-widest font-['Space_Grotesk']">
+                            <span className="text-slate-300 font-bold">{(page - 1) * limit + 1}–{Math.min(page * limit, total)}</span>
+                            {' '}/ {total} kayıt
+                        </p>
+                        <div className="flex items-center gap-1">
+                            {/* İlk sayfa */}
+                            <button
+                                onClick={() => setPage(1)}
+                                disabled={page === 1}
+                                className="w-9 h-9 flex items-center justify-center rounded-lg border border-white/10 text-slate-400 hover:text-cyan-400 hover:border-cyan-500/50 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+                            >
+                                <span className="material-symbols-outlined text-sm">first_page</span>
+                            </button>
+
+                            {/* Önceki */}
+                            <button
+                                onClick={() => setPage(p => p - 1)}
+                                disabled={page === 1}
+                                className="w-9 h-9 flex items-center justify-center rounded-lg border border-white/10 text-slate-400 hover:text-cyan-400 hover:border-cyan-500/50 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+                            >
+                                <span className="material-symbols-outlined text-sm">chevron_left</span>
+                            </button>
+
+                            {/* Sayfa numaraları */}
+                            {Array.from({ length: Math.ceil(total / limit) }, (_, i) => i + 1)
+                                .filter(p => p === 1 || p === Math.ceil(total / limit) || Math.abs(p - page) <= 1)
+                                .reduce<(number | string)[]>((acc, p, i, arr) => {
+                                    if (i > 0 && (p as number) - (arr[i - 1] as number) > 1) acc.push('...')
+                                    acc.push(p)
+                                    return acc
+                                }, [])
+                                .map((p, i) =>
+                                    p === '...' ? (
+                                        <span key={`dots-${i}`} className="w-9 h-9 flex items-center justify-center text-slate-600 text-sm">···</span>
+                                    ) : (
+                                        <button
+                                            key={p}
+                                            onClick={() => setPage(p as number)}
+                                            className="w-9 h-9 flex items-center justify-center rounded-lg text-sm font-bold font-['Space_Grotesk'] transition-all"
+                                            style={{
+                                                background: page === p ? 'rgba(76,215,246,0.15)' : 'transparent',
+                                                color: page === p ? '#4cd7f6' : '#475569',
+                                                border: page === p ? '1px solid rgba(76,215,246,0.4)' : '1px solid transparent',
+                                            }}
+                                        >
+                                            {p}
+                                        </button>
+                                    )
+                                )}
+
+                            {/* Sonraki */}
+                            <button
+                                onClick={() => setPage(p => p + 1)}
+                                disabled={page === Math.ceil(total / limit)}
+                                className="w-9 h-9 flex items-center justify-center rounded-lg border border-white/10 text-slate-400 hover:text-cyan-400 hover:border-cyan-500/50 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+                            >
+                                <span className="material-symbols-outlined text-sm">chevron_right</span>
+                            </button>
+
+                            {/* Son sayfa */}
+                            <button
+                                onClick={() => setPage(Math.ceil(total / limit))}
+                                disabled={page === Math.ceil(total / limit)}
+                                className="w-9 h-9 flex items-center justify-center rounded-lg border border-white/10 text-slate-400 hover:text-cyan-400 hover:border-cyan-500/50 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+                            >
+                                <span className="material-symbols-outlined text-sm">last_page</span>
+                            </button>
+                        </div>
+                    </div>
+                )}
+
                 {/* Severity Analytics */}
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-4">
                     <div
@@ -204,12 +287,12 @@ export default function AlertsPage() {
                         <h3 className="font-bold font-['Space_Grotesk'] text-lg mb-6">Alarm Dağılımı</h3>
                         <div className="space-y-5">
                             {[
-                                { label: 'Hız İhlali', count: counts.speed_violation, color: '#ff4d6d' },
-                                { label: 'Bağlantı Kesildi', count: counts.offline, color: '#facc15' },
-                                { label: 'Araç Hareketsiz', count: counts.idle, color: '#4cd7f6' },
+                                { label: 'Hız İhlali', count: typeCounts.speed_violation, color: '#ff4d6d' },
+                                { label: 'Bağlantı Kesildi', count: typeCounts.offline, color: '#facc15' },
+                                { label: 'Araç Hareketsiz', count: typeCounts.idle, color: '#4cd7f6' },
                             ].map((item) => {
-                                const total = alerts.length || 1
-                                const pct = Math.round((item.count / total) * 100)
+                                const totalCount = typeCounts.speed_violation + typeCounts.offline + typeCounts.idle || 1
+                                const pct = Math.round((item.count / totalCount) * 100)
                                 return (
                                     <div key={item.label}>
                                         <div className="flex justify-between mb-2">
