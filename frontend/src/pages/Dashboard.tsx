@@ -4,18 +4,12 @@ import { MapContainer, TileLayer, Marker } from 'react-leaflet'
 import L from 'leaflet'
 import { useNavigate } from 'react-router'
 import { VEHICLE_COLORS } from '../constants/vehicles'
+import Sidebar from '../components/Sidebar'
 
 export default function Dashboard() {
     const [vehicles, setVehicles] = useState<Record<string, IGPSData>>({})
     const [liveLog, setLiveLog] = useState<Array<IGPSData & { id: string }>>([])    //  & ==>  intersection type — iki tipi birleştir, websocket'den gelen veride "id" degeri var fakat tanimli olan IGPSData'da id degeri yok !!!
     const navigate = useNavigate()
-
-    const handleLogout = () => {
-
-        localStorage.removeItem("token")
-        navigate("/login")
-
-    }
 
     useEffect(() => {
         const socket = new WebSocket('ws://localhost:8080')
@@ -30,46 +24,10 @@ export default function Dashboard() {
 
     return (
         <div className="flex h-screen overflow-hidden bg-[#0b1326] text-[#dae2fd] font-['Inter']">
-            <aside className="w-64 border-r border-[#131b2e] bg-[#0b1326] flex flex-col p-6 space-y-8">
-                <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-cyan-900/50 rounded-lg flex items-center justify-center">
-                        <span className="material-symbols-outlined text-cyan-400">local_shipping</span>
-                    </div>
-                    <div>
-                        <h3 className="text-lg font-black font-['Space_Grotesk'] leading-tight">Fleet Alpha</h3>
-                        <p className="text-[10px] text-slate-400 tracking-widest uppercase">{Object.keys(vehicles).length} Active Units</p>
-                    </div>
-                </div>
 
-                <div className="space-y-2">
-                    <p className="text-[10px] text-slate-500 uppercase tracking-widest font-bold px-2">Vehicles</p>
-                    {Object.entries(vehicles).map(([id, vehicle]) => {
-                        const colorInfo = VEHICLE_COLORS[id]
-                        return (
-                            <div key={id} className="flex items-center gap-3 px-4 py-3 rounded-lg bg-white/5">
-                                <span className="w-2 h-2 rounded-full" style={{ backgroundColor: colorInfo?.color }}></span>
-                                <div>
-                                    <p className="text-sm font-bold font-['Space_Grotesk']">{colorInfo?.label}</p>
-                                    <p className="text-[10px] text-slate-500">{vehicle.speed} km/h</p>
-                                </div>
-                                <span className="ml-auto text-[10px] text-emerald-400 font-bold">LIVE</span>
-                            </div>
-                        )
-                    })}
-                </div>
+            <Sidebar vehicles={vehicles} />
 
-                <nav className="space-y-2">
-                    <NavItem icon="dashboard" label="Dashboard" active onClick={() => navigate('/')} />
-                    <NavItem icon="map" label="Live Map" onClick={() => navigate('/')} />
-                    <NavItem icon="history" label="Historical" onClick={() => navigate('/historical')} />
-                </nav>
-                <div className="mt-auto">
-                    <NavItem icon="logout" label="Çıkış Yap" onClick={handleLogout} />
-                </div>
-            </aside>
-
-            {/* buradan aşağısı hiç değişmedi, aynen bıraktım */}
-            <main className="flex-1 flex flex-col overflow-y-auto">
+            <main className="ml-64 flex-1 flex flex-col overflow-y-auto">
                 <header className="h-16 border-b border-[#131b2e] px-8 flex items-center justify-between sticky top-0 bg-[#0b1326]/80 backdrop-blur-md z-50">
                     <h1 className="text-xl font-bold tracking-tighter text-cyan-500 font-['Space_Grotesk']">OBSIDIAN VELOCITY</h1>
                     <div className="flex items-center gap-4 text-xs font-bold uppercase tracking-widest text-emerald-400">
@@ -184,11 +142,5 @@ export default function Dashboard() {
     )
 }
 
-function NavItem({ icon, label, active = false, onClick }: { icon: string; label: string; active?: boolean; onClick?: () => void }) {
-    return (
-        <div onClick={onClick} className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all cursor-pointer ${active ? 'bg-cyan-500/10 text-cyan-400 border-l-4 border-cyan-500' : 'text-slate-400 hover:bg-white/5'}`}>
-            <span className="material-symbols-outlined">{icon}</span>
-            <span className="font-['Space_Grotesk'] text-sm uppercase tracking-widest">{label}</span>
-        </div>
-    )
-}
+
+

@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router'
 import instance from '../api/client'
 import Sidebar from '../components/Sidebar'
 import type { IAlert } from '../types/alert'
@@ -41,7 +40,7 @@ export default function AlertsPage() {
     const [filter, setFilter] = useState<string>('all')
     const [loading, setLoading] = useState(true)
     const [page, setPage] = useState(1)
-    const [limit] = useState(10)            // limit hep sabit kalacagi icin "set" kullanmadik !!
+    const [limit] = useState(5)            // limit hep sabit kalacagi icin "set" kullanmadik !!
     const [total, setTotal] = useState(0)
     const [typeCounts, setTypeCounts] = useState({
         speed_violation: 0,
@@ -49,7 +48,6 @@ export default function AlertsPage() {
         idle: 0,
     })
 
-    const navigate = useNavigate()
 
     useEffect(() => {
         const fetchAlerts = async () => {
@@ -76,11 +74,6 @@ export default function AlertsPage() {
         fetchAlerts()
     }, [filter, page])
 
-
-    const handleLogout = () => {
-        localStorage.removeItem('token')
-        navigate('/login')
-    }
 
     return (
         <div className="flex min-h-screen bg-[#060e20] text-[#dae2fd] font-['Inter'] overflow-x-hidden">
