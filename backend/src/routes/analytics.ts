@@ -27,11 +27,28 @@ router.get("/analytics", async (req, res) => {
                 }
             },
             {
+                $addFields: {
+                    riskScore: {
+                        $min: [
+                            {
+                                $add: [         // add ==> toplama yapar ve icine array([]) alir
+                                    { $multiply: ["$speedViolations", 3] },     // multiply ==> carpma yapar icine array([]) alir
+                                    { $multiply: ["$offlineCount", 1] }     // "$offlineCount" — başındaki $ işareti "bu bir değer değil, o field'ın değerini al. $ olmasaydi string algilardi hata verirdi!!"
+                                ]
+                            },
+                            100
+                        ]
+
+                    }
+                }
+            },
+            {
                 $project: {
                     _id: 0,
                     vehicleId: "$_id",
                     speedViolations: 1,
-                    offlineCount: 1
+                    offlineCount: 1,
+                    riskScore: 1
                 }
             }
         ])
