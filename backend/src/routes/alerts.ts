@@ -22,9 +22,12 @@ router.get("/alerts", async (req, res) => {
         const offset = (pageNumber - 1) * limitNumber;
         const response = await Alert.find(query).sort({ createdAt: -1 }).skip(offset).limit(limitNumber)
         const total = await Alert.countDocuments(query)
+        const speedViolationCounts = await Alert.countDocuments({ type: 'speed_violation' })
+        const offlineCounts = await Alert.countDocuments({ type: 'offline' })
+        const idleCounts = await Alert.countDocuments({ type: 'idle' })
 
         // const response = await Alert.find(query).sort({ createdAt: -1 }).limit(50)   // query = {} bossa, Alert.find({}) seklinde hepsini getirir
-        return res.status(200).json({ message: "Alerts Kayitlari Getirildi!", response, total })    // total ==> toplam kayit sayisi pagination icin !!
+        return res.status(200).json({ message: "Alerts Kayitlari Getirildi!", response, total, speedViolationCounts, offlineCounts, idleCounts })    // total ==> toplam kayit sayisi pagination icin !!
     } catch (error) {
         return res.status(500).json({ message: "Bir hata oluştu", error })
     }
