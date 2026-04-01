@@ -84,10 +84,28 @@ const SEV_STYLE = {
 
 interface ActiveCtx { vehicleId: string; dayIndex?: number }
 
-function getActiveStats(ctx: ActiveCtx | null) {
-    if (!ctx) return WEEKLY_STATS.all
-    if (ctx.dayIndex === undefined) return WEEKLY_STATS[ctx.vehicleId]
-    return DAILY_STATS[ctx.vehicleId]?.[ctx.dayIndex] ?? WEEKLY_STATS[ctx.vehicleId]
+function getActiveStats(ctx: ActiveCtx | null, vehicleAnalytics: IVehicleAnalytics[]) {
+    // fake kalan kısımlar için hâlâ WEEKLY_STATS kullanıyoruz
+    const weeklyBase = ctx ? WEEKLY_STATS[ctx.vehicleId] : WEEKLY_STATS.all
+    const dailyBase = ctx?.dayIndex !== undefined
+        ? DAILY_STATS[ctx.vehicleId]?.[ctx.dayIndex] ?? weeklyBase
+        : weeklyBase
+
+    // DB'den gelen gerçek veriler
+    const realData = ctx
+        ? vehicleAnalytics.find(x => x.vehicleId === ctx.vehicleId)
+        : vehicleAnalytics.length > 0 ? {
+            riskScore: Math.round(vehicleAnalytics.reduce((sum, v) => sum + v.riskScore, 0) / vehicleAnalytics.length),
+            speedViolations: vehicleAnalytics.reduce((sum, v) => sum + v.speedViolations, 0),
+            offlineCount: vehicleAnalytics.reduce((sum, v) => sum + v.offlineCount, 0),
+        } : null
+
+    return {
+        ...dailyBase,                                           // fake: idleHours, idleRatio, estimatedFuel, efficiency
+        riskScore: realData?.riskScore ?? dailyBase.riskScore,          // gerçek
+        speedViolations: realData?.speedViolations ?? dailyBase.speedViolations,  // gerçek
+        offlineCount: realData?.offlineCount ?? dailyBase.offlineCount,           // gerçek
+    }
 }
 
 // ============================================================
@@ -322,6 +340,7 @@ function ViolationPanel({ ctx }: { ctx: ActiveCtx | null }) {
     )
 }
 
+
 function RiskTable({ ctx, onVehicleClick, vehicleAnalytics }: {
 
     ctx: ActiveCtx | null                                       // alinan prop'larin tipleri !!!
@@ -505,7 +524,7 @@ export default function AnalyticsPage() {
         fetchData()
     }, [])
 
-    const stats = getActiveStats(ctx)
+    const stats = getActiveStats(ctx, vehicleAnalytics)  // vehicleAnalytics eklendi
     const isDay = ctx?.dayIndex !== undefined
 
     const handleVehicleClick = (vehicleId: string) => {
