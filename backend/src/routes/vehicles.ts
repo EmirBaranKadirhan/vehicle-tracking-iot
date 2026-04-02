@@ -36,4 +36,21 @@ router.post("/vehicles/add", async (req: any, res) => {
 })
 
 
+
+router.get("/vehicles", async (req: any, res) => {
+
+    try {
+
+        const userId = req.userId
+        const vehicles = await Vehicle.find({ userId })
+        return res.status(200).json({ message: "Araçlar getirildi", vehicles })
+
+    } catch (error) {
+        return res.status(500).json({ message: "Bir hata oluştu", error })
+    }
+
+
+})
+
+
 export default router
