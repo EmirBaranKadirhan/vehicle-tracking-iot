@@ -2,9 +2,9 @@ import Groq from "groq-sdk";
 
 
 interface TypeCounts {
-    speedViolations: number
-    offlineCount: number
-    idleCount: number
+    speed_violation: number
+    offline: number
+    idle: number
 }
 
 interface TypeVehicleCounts {
@@ -28,13 +28,13 @@ export async function analyzeAlerts(typeCounts: TypeCounts, vehicleCounts: TypeV
                 content: `You are a fleet management AI analyst. Analyze the following alert data from the last 7 days and return EXACTLY 5 analysis cards as a JSON array.
 
                         Fleet Alert Summary (Last 7 Days):
-                        - Speed Violations: ${typeCounts.speedViolations}
-                        - Offline Alerts: ${typeCounts.offlineCount}
-                        - Idle Alerts: ${typeCounts.idleCount}
-                        - Total Alerts: ${typeCounts.speedViolations + typeCounts.offlineCount + typeCounts.idleCount}
+                        - Speed Violations: ${typeCounts.speed_violation}
+                        - Offline Alerts: ${typeCounts.offline}
+                        - Idle Alerts: ${typeCounts.idle}
+                        - Total Alerts: ${typeCounts.speed_violation + typeCounts.offline + typeCounts.idle}
 
                         Per Vehicle Breakdown:
-                        ${vehicleCounts.map(v => `- Vehicle ${v.vehicleId}: speed=${v.speedViolations}, offline=${v.offlineCount}, idle=${v.idleCount}`).join('\n')}
+                            ${vehicleCounts.map(v => `- Vehicle ${v.vehicleId}: speed=${v.speedViolations}, offline=${v.offlineCount}, idle=${v.idleCount}`).join('\n')}
 
                         Return ONLY a JSON array with exactly 5 objects. No explanation, no markdown, no extra text. Just the raw JSON array.
 
@@ -48,7 +48,14 @@ export async function analyzeAlerts(typeCounts: TypeCounts, vehicleCounts: TypeV
                         2. Risk Analysis (speed violations focus)
                         3. Operational Efficiency (offline & idle focus)
                         4. Most Problematic Vehicle
-                        5. Recommendations & Actions`,
+                        5. Recommendations & Actions
+                        
+                        Severity guidelines:
+                        - "info": positive performance, good metrics, or neutral observations
+                        - "warning": moderate issues that need attention
+                        - "critical": serious problems requiring immediate action
+
+                        Not every card must be critical. If a vehicle performed well, acknowledge it positively.`,
             },
         ],
     });
