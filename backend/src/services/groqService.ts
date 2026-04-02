@@ -2,16 +2,16 @@ import Groq from "groq-sdk";
 
 
 interface TypeCounts {
-    speed_violation: number
-    offline: number
-    idle: number
+    speedViolations: number
+    offlineCount: number
+    idleCount: number
 }
 
 interface TypeVehicleCounts {
     vehicleId: string
-    speed_violation: number
-    offline: number
-    idle: number
+    speedViolations: number
+    offlineCount: number
+    idleCount: number
 }
 
 
@@ -28,13 +28,13 @@ export async function analyzeAlerts(typeCounts: TypeCounts, vehicleCounts: TypeV
                 content: `You are a fleet management AI analyst. Analyze the following alert data from the last 7 days and return EXACTLY 5 analysis cards as a JSON array.
 
                         Fleet Alert Summary (Last 7 Days):
-                        - Speed Violations: ${typeCounts.speed_violation}
-                        - Offline Alerts: ${typeCounts.offline}
-                        - Idle Alerts: ${typeCounts.idle}
-                        - Total Alerts: ${typeCounts.speed_violation + typeCounts.offline + typeCounts.idle}
+                        - Speed Violations: ${typeCounts.speedViolations}
+                        - Offline Alerts: ${typeCounts.offlineCount}
+                        - Idle Alerts: ${typeCounts.idleCount}
+                        - Total Alerts: ${typeCounts.speedViolations + typeCounts.offlineCount + typeCounts.idleCount}
 
                         Per Vehicle Breakdown:
-                        ${vehicleCounts.map(v => `- Vehicle ${v.vehicleId}: speed=${v.speed_violation}, offline=${v.offline}, idle=${v.idle}`).join('\n')}
+                        ${vehicleCounts.map(v => `- Vehicle ${v.vehicleId}: speed=${v.speedViolations}, offline=${v.offlineCount}, idle=${v.idleCount}`).join('\n')}
 
                         Return ONLY a JSON array with exactly 5 objects. No explanation, no markdown, no extra text. Just the raw JSON array.
 
