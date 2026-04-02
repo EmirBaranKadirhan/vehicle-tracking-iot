@@ -3,13 +3,14 @@ import type { IGPSData } from '../types/gps'
 import { MapContainer, TileLayer, Marker } from 'react-leaflet'
 import L from 'leaflet'
 import { useNavigate } from 'react-router'
-import { VEHICLE_COLORS } from '../constants/vehicles'
 import Sidebar from '../components/Sidebar'
+import { useVehicles } from '../hooks/useVehicles'
 
 export default function Dashboard() {
     const [vehicles, setVehicles] = useState<Record<string, IGPSData>>({})
     const [liveLog, setLiveLog] = useState<Array<IGPSData & { id: string }>>([])    //  & ==>  intersection type — iki tipi birleştir, websocket'den gelen veride "id" degeri var fakat tanimli olan IGPSData'da id degeri yok !!!
     const navigate = useNavigate()
+    const vehicleList = useVehicles()
 
     useEffect(() => {
         const socket = new WebSocket('ws://localhost:8080')
@@ -43,12 +44,12 @@ export default function Dashboard() {
                     </header>
 
                     {Object.entries(vehicles).map(([id, vehicle]) => {
-                        const colorInfo = VEHICLE_COLORS[id]
+                        const colorInfo = vehicleList.find(v => v.vehicleId === id)
                         return (
                             <div key={id} className="space-y-4">
                                 <div className="flex items-center gap-3">
                                     <span className="w-3 h-3 rounded-full" style={{ backgroundColor: colorInfo?.color }}></span>
-                                    <h3 className="text-lg font-bold font-['Space_Grotesk']" style={{ color: colorInfo?.color }}>{colorInfo?.label}</h3>
+                                    <h3 className="text-lg font-bold font-['Space_Grotesk']" style={{ color: colorInfo?.color }}>{colorInfo?.vehicleName}</h3>
                                 </div>
                                 <div className="grid grid-cols-12 gap-4">
                                     <div className="col-span-12 lg:col-span-3 bg-[#131b2e] p-6 rounded-2xl border border-white/5 flex flex-col items-center">
@@ -120,12 +121,12 @@ export default function Dashboard() {
                             </thead>
                             <tbody>
                                 {liveLog.map((log, i) => {
-                                    const colorInfo = VEHICLE_COLORS[log.id]
+                                    const colorInfo = vehicleList.find(v => v.vehicleId === log.id)
                                     return (
                                         <tr key={i} className="border-b border-white/5 hover:bg-white/5 transition-colors">
                                             <td className="px-6 py-4 flex items-center gap-3">
                                                 <span className="w-2 h-2 rounded-full" style={{ backgroundColor: colorInfo?.color }}></span>
-                                                <span style={{ color: colorInfo?.color }}>{colorInfo?.label}</span>
+                                                <span style={{ color: colorInfo?.color }}>{colorInfo?.vehicleName}</span>
                                             </td>
                                             <td className="px-6 py-4 font-mono">{log.speed} km/h</td>
                                             <td className="px-6 py-4 font-mono">{log.altitude} m</td>
