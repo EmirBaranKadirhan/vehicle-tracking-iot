@@ -2,12 +2,9 @@ import React, { useEffect, useState } from 'react'
 import Sidebar from '../components/Sidebar'
 import type { IVehicleAnalytics } from '../types/analytics'
 import { getAnalytics } from '../api/analytics'
+import { useVehicles } from '../hooks/useVehicles'
 
-const VEHICLES = [
-    { id: '1', label: 'Alpha', location: 'Ayvalık', color: '#4cd7f6' },
-    { id: '2', label: 'Beta', location: 'Mersin', color: '#94de2d' },
-    { id: '3', label: 'Zeta', location: 'İzmir', color: '#ffb873' },
-]
+// VEHICLES array kaldırıldı — useVehicles hook'undan geliyor
 
 const DAYS = ['Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt', 'Paz']
 
@@ -62,6 +59,14 @@ const DAILY_STATS: Record<string, Record<number, {
     },
 }
 
+// VehicleItem tipi — useVehicles'dan gelen + fakeId eklendi
+interface VehicleItem {
+    vehicleId: string
+    vehicleName: string
+    color?: string
+    fakeId: string
+}
+
 function getRiskBadge(score: number) {
     if (score >= 75) return { label: 'Critical', color: '#ff4d6d', bg: 'rgba(255,77,109,0.12)' }
     if (score >= 50) return { label: 'Warning', color: '#ffb873', bg: 'rgba(255,184,115,0.12)' }
@@ -84,14 +89,15 @@ const SEV_STYLE = {
 
 interface ActiveCtx { vehicleId: string; dayIndex?: number }
 
-function getActiveStats(ctx: ActiveCtx | null, vehicleAnalytics: IVehicleAnalytics[]) {
-    // fake kalan kısımlar için hâlâ WEEKLY_STATS kullanıyoruz
-    const weeklyBase = ctx ? WEEKLY_STATS[ctx.vehicleId] : WEEKLY_STATS.all
-    const dailyBase = ctx?.dayIndex !== undefined
-        ? DAILY_STATS[ctx.vehicleId]?.[ctx.dayIndex] ?? weeklyBase
+function getActiveStats(ctx: ActiveCtx | null, vehicleAnalytics: IVehicleAnalytics[], vehicleList: VehicleItem[]) {
+    // ctx.vehicleId artık TRUCK-001 formatında — fakeId'ye çevirip WEEKLY_STATS'a bakıyoruz
+    const fakeId = ctx ? vehicleList.find(v => v.vehicleId === ctx.vehicleId)?.fakeId ?? null : null
+
+    const weeklyBase = fakeId ? WEEKLY_STATS[fakeId] : WEEKLY_STATS.all
+    const dailyBase = ctx?.dayIndex !== undefined && fakeId
+        ? DAILY_STATS[fakeId]?.[ctx.dayIndex] ?? weeklyBase
         : weeklyBase
 
-    // DB'den gelen gerçek veriler
     const realData = ctx
         ? vehicleAnalytics.find(x => x.vehicleId === ctx.vehicleId)
         : vehicleAnalytics.length > 0 ? {
@@ -101,27 +107,19 @@ function getActiveStats(ctx: ActiveCtx | null, vehicleAnalytics: IVehicleAnalyti
         } : null
 
     return {
-        ...dailyBase,                                           // fake: idleHours, idleRatio, estimatedFuel, efficiency
-        riskScore: realData?.riskScore ?? dailyBase.riskScore,          // gerçek
-        speedViolations: realData?.speedViolations ?? dailyBase.speedViolations,  // gerçek
-        offlineCount: realData?.offlineCount ?? dailyBase.offlineCount,           // gerçek
+        ...dailyBase,
+        riskScore: realData?.riskScore ?? dailyBase?.riskScore ?? 0,
+        speedViolations: realData?.speedViolations ?? dailyBase?.speedViolations ?? 0,
+        offlineCount: realData?.offlineCount ?? dailyBase?.offlineCount ?? 0,
     }
 }
 
-// ============================================================
-// BREADCRUMB
-// Kurallar:
-//   "Filo Geneli"       → her zaman tıklanabilir (aktif değilse)
-//   "Alpha — Ayvalık"   → gün seçiliyse tıklanabilir, haftalıkta aktif
-//   "Pzt"               → aktif, hiçbir zaman tıklanamaz
-// Fazladan "Haftalık görünüm" butonu YOK — araç adına tıklamak yeterli
-// ============================================================
-
-function Breadcrumb({ ctx, onNavigate }: {
+function Breadcrumb({ ctx, onNavigate, vehicleList }: {
     ctx: ActiveCtx | null
     onNavigate: (next: ActiveCtx | null) => void
+    vehicleList: VehicleItem[]
 }) {
-    const vehicle = VEHICLES.find(v => v.id === ctx?.vehicleId)
+    const vehicle = vehicleList.find(v => v.vehicleId === ctx?.vehicleId)
 
     type Crumb = { label: string; onClick?: () => void }
 
@@ -132,10 +130,9 @@ function Breadcrumb({ ctx, onNavigate }: {
         },
     ]
 
-    if (ctx?.vehicleId) {
+    if (ctx?.vehicleId && vehicle) {
         crumbs.push({
-            label: `${vehicle!.label} — ${vehicle!.location}`,
-            // Gün seçiliyse tıklanabilir (haftalığa döner), haftalıktaysa aktif (tıklanamaz)
+            label: `${vehicle.vehicleName} — ${vehicle.vehicleId}`,
             onClick: ctx.dayIndex !== undefined ? () => onNavigate({ vehicleId: ctx.vehicleId }) : undefined,
         })
     }
@@ -143,7 +140,6 @@ function Breadcrumb({ ctx, onNavigate }: {
     if (ctx?.dayIndex !== undefined) {
         crumbs.push({
             label: DAYS[ctx.dayIndex],
-            // Aktif crumb — tıklanamaz
         })
     }
 
@@ -182,13 +178,14 @@ function Breadcrumb({ ctx, onNavigate }: {
     )
 }
 
-function LineChart({ ctx, onVehicleClick, onDayClick }: {
+function LineChart({ ctx, onVehicleClick, onDayClick, vehicleList }: {
     ctx: ActiveCtx | null
     onVehicleClick: (id: string) => void
     onDayClick: (vehicleId: string, dayIndex: number) => void
+    vehicleList: VehicleItem[]
 }) {
     const W = 700, H = 200, PX = 20, PY = 10
-    const maxVal = Math.max(...VEHICLES.flatMap(v => WEEKLY_ALERTS[v.id]), ...LAST_WEEK_ALERTS) + 2
+    const maxVal = Math.max(...vehicleList.flatMap(v => WEEKLY_ALERTS[v.fakeId] ?? [0]), ...LAST_WEEK_ALERTS) + 2
     const toX = (i: number) => PX + (i / 6) * (W - PX * 2)
     const toY = (v: number) => H - PY - (v / maxVal) * (H - PY * 2)
     const makePath = (vals: number[]) =>
@@ -197,11 +194,11 @@ function LineChart({ ctx, onVehicleClick, onDayClick }: {
     return (
         <div>
             <div className="flex flex-wrap gap-5 items-center mb-6">
-                {VEHICLES.map(v => {
-                    const isActive = ctx?.vehicleId === v.id
-                    const isDimmed = ctx !== null && ctx.vehicleId !== v.id
+                {vehicleList.map(v => {
+                    const isActive = ctx?.vehicleId === v.vehicleId
+                    const isDimmed = ctx !== null && ctx.vehicleId !== v.vehicleId
                     return (
-                        <button key={v.id} onClick={() => onVehicleClick(v.id)}
+                        <button key={v.vehicleId} onClick={() => onVehicleClick(v.vehicleId)}
                             className="flex items-center gap-2 transition-all"
                             style={{ opacity: isDimmed ? 0.25 : 1 }}>
                             <span className="w-3 h-3 rounded-full transition-all" style={{
@@ -209,7 +206,7 @@ function LineChart({ ctx, onVehicleClick, onDayClick }: {
                                 boxShadow: isActive ? `0 0 8px ${v.color}` : undefined,
                             }} />
                             <span className="text-[10px] text-slate-400 font-['Space_Grotesk'] uppercase tracking-wider">
-                                {v.label}
+                                {v.vehicleName}
                             </span>
                         </button>
                     )
@@ -233,22 +230,23 @@ function LineChart({ ctx, onVehicleClick, onDayClick }: {
                 <path d={makePath(LAST_WEEK_ALERTS)} fill="none"
                     stroke="rgba(134,147,151,0.3)" strokeWidth="1.5" strokeDasharray="4,4" />
 
-                {VEHICLES.map(v => {
-                    const isSelected = ctx?.vehicleId === v.id
-                    const isDimmed = ctx !== null && ctx.vehicleId !== v.id
+                {vehicleList.map(v => {
+                    const alerts = WEEKLY_ALERTS[v.fakeId] ?? []
+                    const isSelected = ctx?.vehicleId === v.vehicleId
+                    const isDimmed = ctx !== null && ctx.vehicleId !== v.vehicleId
                     return (
-                        <g key={v.id}>
-                            <path d={makePath(WEEKLY_ALERTS[v.id])} fill="none"
+                        <g key={v.vehicleId}>
+                            <path d={makePath(alerts)} fill="none"
                                 stroke={v.color} strokeWidth={isSelected ? 3 : 2}
                                 opacity={isDimmed ? 0.1 : 1}
                                 style={{ transition: 'all 0.3s' }} />
-                            {WEEKLY_ALERTS[v.id].map((val, i) => {
-                                const isActiveDay = ctx?.vehicleId === v.id && ctx?.dayIndex === i
+                            {alerts.map((val, i) => {
+                                const isActiveDay = ctx?.vehicleId === v.vehicleId && ctx?.dayIndex === i
                                 return (
                                     <g key={i}>
                                         <circle cx={toX(i)} cy={toY(val)} r={14} fill="transparent"
                                             style={{ cursor: 'pointer' }}
-                                            onClick={() => onDayClick(v.id, i)} />
+                                            onClick={() => onDayClick(v.vehicleId, i)} />
                                         <circle cx={toX(i)} cy={toY(val)}
                                             r={isActiveDay ? 7 : isSelected ? 5 : 3}
                                             fill={isActiveDay ? '#fff' : v.color}
@@ -256,7 +254,7 @@ function LineChart({ ctx, onVehicleClick, onDayClick }: {
                                             strokeWidth={isActiveDay ? 2.5 : 0}
                                             opacity={isDimmed ? 0.1 : 1}
                                             style={{ transition: 'all 0.25s', cursor: 'pointer' }}
-                                            onClick={() => onDayClick(v.id, i)} />
+                                            onClick={() => onDayClick(v.vehicleId, i)} />
                                     </g>
                                 )
                             })}
@@ -302,11 +300,12 @@ function StatCard({ label, value, sub, color, icon, highlight }: {
     )
 }
 
-function ViolationPanel({ ctx }: { ctx: ActiveCtx | null }) {
+function ViolationPanel({ ctx, vehicleList }: { ctx: ActiveCtx | null, vehicleList: VehicleItem[] }) {
     if (!ctx || ctx.dayIndex === undefined) return null
-    const daily = DAILY_STATS[ctx.vehicleId]?.[ctx.dayIndex]
+    const vehicle = vehicleList.find(v => v.vehicleId === ctx.vehicleId)
+    if (!vehicle) return null
+    const daily = DAILY_STATS[vehicle.fakeId]?.[ctx.dayIndex]
     if (!daily) return null
-    const vehicle = VEHICLES.find(v => v.id === ctx.vehicleId)!
 
     return (
         <div className="p-5 rounded-xl" style={{
@@ -318,7 +317,7 @@ function ViolationPanel({ ctx }: { ctx: ActiveCtx | null }) {
                 <h3 className="font-black font-['Space_Grotesk'] text-sm uppercase tracking-widest">
                     {DAYS[ctx.dayIndex]} Günü İhlalleri
                 </h3>
-                <span className="text-[10px] text-slate-500">— {vehicle.label}</span>
+                <span className="text-[10px] text-slate-500">— {vehicle.vehicleName}</span>
             </div>
             <div className="flex flex-wrap gap-2">
                 {daily.violations.length === 0
@@ -340,19 +339,16 @@ function ViolationPanel({ ctx }: { ctx: ActiveCtx | null }) {
     )
 }
 
-
-function RiskTable({ ctx, onVehicleClick, vehicleAnalytics }: {
-
-    ctx: ActiveCtx | null                                       // alinan prop'larin tipleri !!!
+function RiskTable({ ctx, onVehicleClick, vehicleAnalytics, vehicleList }: {
+    ctx: ActiveCtx | null
     onVehicleClick: (id: string) => void
     vehicleAnalytics: IVehicleAnalytics[]
+    vehicleList: VehicleItem[]
 }) {
-    const sorted = [...VEHICLES].sort((a, b) => {
-        const aData = vehicleAnalytics.find(x => x.vehicleId === a.id)
-        const bData = vehicleAnalytics.find(x => x.vehicleId === b.id)
-
+    const sorted = [...vehicleList].sort((a, b) => {
+        const aData = vehicleAnalytics.find(x => x.vehicleId === a.vehicleId)
+        const bData = vehicleAnalytics.find(x => x.vehicleId === b.vehicleId)
         return (bData?.riskScore ?? 0) - (aData?.riskScore ?? 0)
-
     })
 
     return (
@@ -365,18 +361,18 @@ function RiskTable({ ctx, onVehicleClick, vehicleAnalytics }: {
             </div>
             <div className="divide-y divide-white/5">
                 {sorted.map(v => {
-                    const s = vehicleAnalytics.find(x => x.vehicleId === v.id)
+                    const s = vehicleAnalytics.find(x => x.vehicleId === v.vehicleId)
                     const badge = getRiskBadge(s?.riskScore ?? 0)
-                    const isActive = ctx?.vehicleId === v.id
+                    const isActive = ctx?.vehicleId === v.vehicleId
                     return (
-                        <div key={v.id} onClick={() => onVehicleClick(v.id)}
+                        <div key={v.vehicleId} onClick={() => onVehicleClick(v.vehicleId)}
                             className="px-6 py-5 cursor-pointer hover:bg-white/5 transition-all"
                             style={{ background: isActive ? `${v.color}08` : undefined }}>
                             <div className="flex items-center justify-between mb-3">
                                 <div className="flex items-center gap-3">
                                     <span className="w-2 h-2 rounded-full" style={{ background: v.color }} />
-                                    <span className="font-bold font-['Space_Grotesk'] text-sm text-white">{v.label}</span>
-                                    <span className="text-[10px] text-slate-500">{v.location}</span>
+                                    <span className="font-bold font-['Space_Grotesk'] text-sm text-white">{v.vehicleName}</span>
+                                    <span className="text-[10px] text-slate-500">{v.vehicleId}</span>
                                 </div>
                                 <div className="flex items-center gap-3">
                                     <span className="text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-full"
@@ -409,13 +405,15 @@ function RiskTable({ ctx, onVehicleClick, vehicleAnalytics }: {
     )
 }
 
-function IdleAnalysis({ ctx, onVehicleClick }: {
+function IdleAnalysis({ ctx, onVehicleClick, vehicleList }: {
     ctx: ActiveCtx | null
     onVehicleClick: (id: string) => void
+    vehicleList: VehicleItem[]
 }) {
-    const sorted = [...VEHICLES].sort((a, b) => WEEKLY_STATS[b.id].idleHours - WEEKLY_STATS[a.id].idleHours)
-    const maxHours = Math.max(...VEHICLES.map(v => WEEKLY_STATS[v.id].idleHours))
-    const summary = WEEKLY_STATS[ctx?.vehicleId ?? 'all']
+    const sorted = [...vehicleList].sort((a, b) => WEEKLY_STATS[b.fakeId]?.idleHours - WEEKLY_STATS[a.fakeId]?.idleHours)
+    const maxHours = Math.max(...vehicleList.map(v => WEEKLY_STATS[v.fakeId]?.idleHours ?? 0))
+    const activeFakeId = vehicleList.find(v => v.vehicleId === ctx?.vehicleId)?.fakeId ?? 'all'
+    const summary = WEEKLY_STATS[activeFakeId] ?? WEEKLY_STATS.all
 
     return (
         <div className="p-6 rounded-2xl" style={{
@@ -431,21 +429,22 @@ function IdleAnalysis({ ctx, onVehicleClick }: {
 
             <div className="space-y-4">
                 {sorted.map(v => {
-                    const s = WEEKLY_STATS[v.id]
+                    const s = WEEKLY_STATS[v.fakeId]
+                    if (!s) return null
                     const level = getIdleLevel(s.idleRatio, s.idleHours)
                     const barWidth = (s.idleHours / maxHours) * 100
-                    const isActive = ctx?.vehicleId === v.id
-                    const isDimmed = ctx !== null && ctx.vehicleId !== v.id
+                    const isActive = ctx?.vehicleId === v.vehicleId
+                    const isDimmed = ctx !== null && ctx.vehicleId !== v.vehicleId
 
                     return (
-                        <div key={v.id}
+                        <div key={v.vehicleId}
                             className="rounded-xl p-4 cursor-pointer transition-all duration-300"
                             style={{
                                 background: isActive ? level.bg : 'rgba(255,255,255,0.02)',
                                 border: `1px solid ${isActive ? level.color + '30' : 'transparent'}`,
                                 opacity: isDimmed ? 0.35 : 1,
                             }}
-                            onClick={() => onVehicleClick(v.id)}>
+                            onClick={() => onVehicleClick(v.vehicleId)}>
 
                             <div className="flex items-center justify-between mb-3">
                                 <div className="flex items-center gap-2">
@@ -455,7 +454,7 @@ function IdleAnalysis({ ctx, onVehicleClick }: {
                                     }} />
                                     <span className="text-xs font-bold font-['Space_Grotesk'] uppercase tracking-wider"
                                         style={{ color: isActive ? v.color : '#dae2fd' }}>
-                                        {v.label}
+                                        {v.vehicleName}
                                     </span>
                                     <span className="text-[9px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-full"
                                         style={{ color: level.color, background: level.bg }}>
@@ -510,12 +509,14 @@ export default function AnalyticsPage() {
     const [ctx, setCtx] = useState<ActiveCtx | null>(null)
     const [vehicleAnalytics, setVehicleAnalytics] = useState<IVehicleAnalytics[]>([])
 
-    useEffect(() => {
+    // useVehicles'dan gelen listeye fakeId ekliyoruz — WEEKLY_STATS/DAILY_STATS '1','2','3' key'i kullanıyor
+    const rawList = useVehicles()
+    const vehicleList: VehicleItem[] = rawList.map((v, i) => ({ ...v, fakeId: String(i + 1) }))
 
+    useEffect(() => {
         const fetchData = async () => {
             try {
-                const res = await getAnalytics();
-                // console.log(res)
+                const res = await getAnalytics()
                 setVehicleAnalytics(res)
             } catch (error) {
                 console.log(error)
@@ -524,7 +525,7 @@ export default function AnalyticsPage() {
         fetchData()
     }, [])
 
-    const stats = getActiveStats(ctx, vehicleAnalytics)  // vehicleAnalytics eklendi
+    const stats = getActiveStats(ctx, vehicleAnalytics, vehicleList)
     const isDay = ctx?.dayIndex !== undefined
 
     const handleVehicleClick = (vehicleId: string) => {
@@ -552,7 +553,7 @@ export default function AnalyticsPage() {
 
                 <div className="space-y-3">
                     <h2 className="text-4xl font-black font-['Space_Grotesk'] tracking-tight">Fleet Analytics</h2>
-                    <Breadcrumb ctx={ctx} onNavigate={setCtx} />
+                    <Breadcrumb ctx={ctx} onNavigate={setCtx} vehicleList={vehicleList} />
                     <p className="text-slate-500 text-xs">
                         {!ctx && "Legend'dan araç seç · Grafikte noktaya tıkla → o günün detayı"}
                         {ctx && !isDay && 'Grafikte bir noktaya tıkla → kartlar o günün verisini gösterir'}
@@ -579,14 +580,14 @@ export default function AnalyticsPage() {
                             Noktaya tıkla → o günün verisini kartlarda görüntüle
                         </p>
                     </div>
-                    <LineChart ctx={ctx} onVehicleClick={handleVehicleClick} onDayClick={handleDayClick} />
+                    <LineChart ctx={ctx} onVehicleClick={handleVehicleClick} onDayClick={handleDayClick} vehicleList={vehicleList} />
                 </div>
 
-                <ViolationPanel ctx={ctx} />
+                <ViolationPanel ctx={ctx} vehicleList={vehicleList} />
 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <RiskTable ctx={ctx} onVehicleClick={handleVehicleClick} vehicleAnalytics={vehicleAnalytics} />
-                    <IdleAnalysis ctx={ctx} onVehicleClick={handleVehicleClick} />
+                    <RiskTable ctx={ctx} onVehicleClick={handleVehicleClick} vehicleAnalytics={vehicleAnalytics} vehicleList={vehicleList} />
+                    <IdleAnalysis ctx={ctx} onVehicleClick={handleVehicleClick} vehicleList={vehicleList} />
                 </div>
 
             </main>
