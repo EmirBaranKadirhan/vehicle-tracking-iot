@@ -9,3 +9,13 @@ export async function getAnalytics() {
     return data.result
 
 }
+
+
+export async function getAiSummary() {
+
+    const url = "/api/analytics/ai-summary"
+
+    const { data } = await instance.post(url)
+
+    return data.cards
+}

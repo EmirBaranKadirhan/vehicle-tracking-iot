@@ -6,3 +6,11 @@ export interface IAlert {
     speed?: number
     createdAt: string
 }
+
+
+
+export interface IAiCards {
+    title: string
+    insight: string
+    severity: "critical" | "warning" | "info"
+}
