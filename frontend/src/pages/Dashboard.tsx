@@ -29,13 +29,6 @@ export default function Dashboard() {
             <Sidebar vehicles={vehicles} />
 
             <main className="ml-64 flex-1 flex flex-col overflow-y-auto">
-                <header className="h-16 border-b border-[#131b2e] px-8 flex items-center justify-between sticky top-0 bg-[#0b1326]/80 backdrop-blur-md z-50">
-                    <h1 className="text-xl font-bold tracking-tighter text-cyan-500 font-['Space_Grotesk']">TrackFlow</h1>
-                    <div className="flex items-center gap-4 text-xs font-bold uppercase tracking-widest text-emerald-400">
-                        <span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span>
-                        System: Nominal
-                    </div>
-                </header>
 
                 <div className="p-8 space-y-8">
                     <header>

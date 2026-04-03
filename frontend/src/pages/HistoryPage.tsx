@@ -24,14 +24,9 @@ export default function HistoryPage() {
     return (
         <div className="flex min-h-screen bg-[#0b1326] text-[#dae2fd] font-['Inter']">
 
-            {/* Top Bar */}
-            <header className="h-16 border-b border-[#131b2e] px-8 flex items-center justify-between sticky top-0 bg-[#0b1326]/80 backdrop-blur-md z-50">
-                <h1 className="text-xl font-bold tracking-tighter text-cyan-500 font-['Space_Grotesk']">OBSIDIAN VELOCITY</h1>
-            </header>
-
             <Sidebar />
 
-            <div className="ml-10 flex-1 p-8 space-y-6">
+            <div className="ml-64 flex-1 p-8 space-y-6">
                 <header>
                     <h2 className="text-4xl font-['Space_Grotesk'] font-bold tracking-tight">Location History</h2>
                     <p className="text-slate-400">Last <span className="text-cyan-400 font-bold">{data.length} records</span></p>
