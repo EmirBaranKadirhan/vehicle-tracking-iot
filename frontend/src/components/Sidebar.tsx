@@ -1,7 +1,7 @@
 import React from 'react'
 import { useNavigate, useLocation } from 'react-router'
-import { VEHICLE_COLORS } from '../constants/vehicles'
 import type { IGPSData } from '../types/gps'
+import { useVehicles } from '../hooks/useVehicles'
 
 interface SidebarProps {
     vehicles?: Record<string, IGPSData>
@@ -30,6 +30,7 @@ function NavItem({ icon, label, active = false, onClick }: {
 export default function Sidebar({ vehicles = {} }: SidebarProps) {
     const navigate = useNavigate()
     const location = useLocation()
+    const vehicleList = useVehicles()
 
     const handleLogout = () => {
         localStorage.removeItem('token')
@@ -54,12 +55,12 @@ export default function Sidebar({ vehicles = {} }: SidebarProps) {
                 <div className="space-y-2">
                     <p className="text-[10px] text-slate-500 uppercase tracking-widest font-bold px-2">Vehicles</p>
                     {Object.entries(vehicles).map(([id, vehicle]) => {
-                        const colorInfo = VEHICLE_COLORS[id]
+                        const colorInfo = vehicleList.find(v => v.vehicleId === id)
                         return (
                             <div key={id} className="flex items-center gap-3 px-4 py-3 rounded-lg bg-white/5">
                                 <span className="w-2 h-2 rounded-full" style={{ backgroundColor: colorInfo?.color }} />
                                 <div>
-                                    <p className="text-sm font-bold font-['Space_Grotesk']">{colorInfo?.label}</p>
+                                    <p className="text-sm font-bold font-['Space_Grotesk']">{colorInfo?.vehicleName}</p>
                                     <p className="text-[10px] text-slate-500">{vehicle.speed} km/h</p>
                                 </div>
                                 <span className="ml-auto text-[10px] text-emerald-400 font-bold">LIVE</span>
@@ -79,7 +80,7 @@ export default function Sidebar({ vehicles = {} }: SidebarProps) {
 
             {/* Logout */}
             <div className="mt-auto">
-                <NavItem icon="logout" label="Çıkış Yap" onClick={handleLogout} />
+                <NavItem icon="logout" label="Logout" onClick={handleLogout} />
             </div>
         </aside>
     )

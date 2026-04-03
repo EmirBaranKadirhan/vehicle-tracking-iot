@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { getVehicles } from '../api/vehicles'
 import type { IVehicle } from '../types/vehicles'
 
-const COLORS = ['#4cd7f6', '#94de2d', '#ffb873']
+const COLORS = ['#4cd7f6', '#94de2d', '#f936cc']
 
 export function useVehicles() {
     const [vehicles, setVehicles] = useState<IVehicle[]>([])

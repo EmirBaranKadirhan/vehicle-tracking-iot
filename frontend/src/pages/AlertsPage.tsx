@@ -9,21 +9,21 @@ import { useVehicles } from '../hooks/useVehicles'
 
 const ALERT_CONFIG = {
     speed_violation: {
-        label: 'Hız İhlali',
+        label: 'Speed Violation',
         color: '#ff4d6d',
         bg: 'rgba(255,77,109,0.08)',
         border: '#ff4d6d',
         icon: 'speed',
     },
     offline: {
-        label: 'Bağlantı Kesildi',
+        label: 'Connection Lost',
         color: '#facc15',
         bg: 'rgba(250,204,21,0.08)',
         border: '#facc15',
         icon: 'wifi_off',
     },
     idle: {
-        label: 'Araç Hareketsiz',
+        label: 'Vehicle Idle',
         color: '#4cd7f6',
         bg: 'rgba(76,215,246,0.08)',
         border: '#4cd7f6',
@@ -66,6 +66,7 @@ export default function AlertsPage() {
                     idle: data.idleCounts,
                 })
 
+
             } catch (err) {
                 console.error(err)
             } finally {
@@ -76,6 +77,16 @@ export default function AlertsPage() {
     }, [filter, page])
 
 
+    useEffect(() => {
+
+        const savedAiSummary = localStorage.getItem("aiSummary")
+        if (savedAiSummary) {
+            setAiCards(JSON.parse(savedAiSummary))
+        }
+
+    }, [])
+
+
     const handleAiAnalysis = async () => {
 
         setAiLoading(true)
@@ -84,6 +95,7 @@ export default function AlertsPage() {
 
             const cards = await getAiSummary()
             setAiCards(cards)
+            localStorage.setItem("aiSummary", JSON.stringify(cards))
 
         } catch (error) {
             console.error(error)
@@ -106,16 +118,16 @@ export default function AlertsPage() {
                 <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
                     <div>
                         <p className="text-[10px] uppercase tracking-[0.3em] text-cyan-400/60 mb-2 font-['Space_Grotesk']">Fleet Intelligence</p>
-                        <h2 className="text-4xl font-black font-['Space_Grotesk'] tracking-tight">Aktif Alarmlar</h2>
-                        <p className="text-slate-400 mt-2 text-sm">Araç filonuza ait gerçek zamanlı uyarılar ve sistem istisnaları.</p>
+                        <h2 className="text-4xl font-black font-['Space_Grotesk'] tracking-tight">Active Alerts</h2>
+                        <p className="text-slate-400 mt-2 text-sm">Real-time alerts and system exceptions for your vehicle fleet.</p>
                     </div>
 
                     {/* Stat Cards */}
                     <div className="flex gap-3">
                         {[
-                            { label: 'Hız İhlali', count: typeCounts.speed_violation, color: '#ff4d6d' },
+                            { label: 'Speed Violation', count: typeCounts.speed_violation, color: '#ff4d6d' },
                             { label: 'Offline', count: typeCounts.offline, color: '#facc15' },
-                            { label: 'Hareketsiz', count: typeCounts.idle, color: '#4cd7f6' },
+                            { label: 'Vehicle Idle', count: typeCounts.idle, color: '#4cd7f6' },
                         ].map((stat) => (
                             <div
                                 key={stat.label}
@@ -137,10 +149,10 @@ export default function AlertsPage() {
                 {/* Filter Tabs */}
                 <div className="flex gap-2 flex-wrap">
                     {[
-                        { value: 'all', label: 'Tümü' },
-                        { value: 'speed_violation', label: 'Hız İhlali' },
+                        { value: 'all', label: 'All' },
+                        { value: 'speed_violation', label: 'Speed Violation' },
                         { value: 'offline', label: 'Offline' },
-                        { value: 'idle', label: 'Hareketsiz' },
+                        { value: 'idle', label: 'Idle' },
                     ].map((tab) => (
                         <button
                             key={tab.value}
@@ -161,9 +173,9 @@ export default function AlertsPage() {
                 {/* Alert List */}
                 <div className="space-y-3">
                     {loading ? (
-                        <div className="text-center py-20 text-slate-500 text-sm">Yükleniyor...</div>
+                        <div className="text-center py-20 text-slate-500 text-sm">Loading...</div>
                     ) : alerts.length === 0 ? (
-                        <div className="text-center py-20 text-slate-500 text-sm">Kayıt bulunamadı.</div>
+                        <div className="text-center py-20 text-slate-500 text-sm">No records found..</div>
                     ) : alerts.map((alert) => {
                         const config = ALERT_CONFIG[alert.type]
                         return (
@@ -187,19 +199,19 @@ export default function AlertsPage() {
                                 {/* Content */}
                                 <div className="flex-1 grid grid-cols-1 md:grid-cols-4 gap-4 items-center">
                                     <div>
-                                        <p className="text-[10px] uppercase tracking-widest text-slate-500 font-['Space_Grotesk'] mb-1">Araç</p>
+                                        <p className="text-[10px] uppercase tracking-widest text-slate-500 font-['Space_Grotesk'] mb-1">Vehicle</p>
                                         <p className="font-bold font-['Space_Grotesk'] text-sm">{vehicleList.find(v => v.vehicleId === alert.vehicleId)?.vehicleName ?? `Vehicle ${alert.vehicleId}`}</p>
                                     </div>
                                     <div>
-                                        <p className="text-[10px] uppercase tracking-widest text-slate-500 font-['Space_Grotesk'] mb-1">Alarm Tipi</p>
+                                        <p className="text-[10px] uppercase tracking-widest text-slate-500 font-['Space_Grotesk'] mb-1">Alert Type</p>
                                         <p className="font-semibold text-sm" style={{ color: config.color }}>{config.label}</p>
                                     </div>
                                     <div>
-                                        <p className="text-[10px] uppercase tracking-widest text-slate-500 font-['Space_Grotesk'] mb-1">Mesaj</p>
+                                        <p className="text-[10px] uppercase tracking-widest text-slate-500 font-['Space_Grotesk'] mb-1">Message</p>
                                         <p className="text-sm text-slate-300 truncate">{alert.message}</p>
                                     </div>
                                     <div className="text-right">
-                                        <p className="text-[10px] uppercase tracking-widest text-slate-500 font-['Space_Grotesk'] mb-1">Zaman</p>
+                                        <p className="text-[10px] uppercase tracking-widest text-slate-500 font-['Space_Grotesk'] mb-1">Time</p>
                                         <p className="text-xs font-mono text-slate-400">
                                             {new Date(alert.createdAt).toLocaleString('tr-TR')}
                                         </p>
@@ -215,7 +227,7 @@ export default function AlertsPage() {
                     <div className="flex items-center justify-between py-4">
                         <p className="text-[11px] text-slate-500 uppercase tracking-widest font-['Space_Grotesk']">
                             <span className="text-slate-300 font-bold">{(page - 1) * limit + 1}–{Math.min(page * limit, total)}</span>
-                            {' '}/ {total} kayıt
+                            {' '}/ {total} records
                         </p>
                         <div className="flex items-center gap-1">
                             {/* İlk sayfa */}
@@ -295,12 +307,12 @@ export default function AlertsPage() {
                             borderLeft: '1px solid rgba(76,215,246,0.1)',
                         }}
                     >
-                        <h3 className="font-bold font-['Space_Grotesk'] text-lg mb-6">Alarm Dağılımı</h3>
+                        <h3 className="font-bold font-['Space_Grotesk'] text-lg mb-6">Alert Distribution</h3>
                         <div className="space-y-5">
                             {[
-                                { label: 'Hız İhlali', count: typeCounts.speed_violation, color: '#ff4d6d' },
-                                { label: 'Bağlantı Kesildi', count: typeCounts.offline, color: '#facc15' },
-                                { label: 'Araç Hareketsiz', count: typeCounts.idle, color: '#4cd7f6' },
+                                { label: 'Speed Violation', count: typeCounts.speed_violation, color: '#ff4d6d' },
+                                { label: 'Connection Lost', count: typeCounts.offline, color: '#facc15' },
+                                { label: 'Vehicle Idle', count: typeCounts.idle, color: '#4cd7f6' },
                             ].map((item) => {
                                 const totalCount = typeCounts.speed_violation + typeCounts.offline + typeCounts.idle || 1
                                 const pct = Math.round((item.count / totalCount) * 100)
@@ -348,7 +360,7 @@ export default function AlertsPage() {
                         {/* Carousel */}
                         {aiCards.length === 0 && !aiLoading && (
                             <p className="text-slate-500 text-xs leading-relaxed">
-                                Filo verilerinize göre otomatik analiz için "Analiz Et" butonuna tıklayın.
+                                Click "Run Analysis" to generate automatic insights based on your fleet data.
                             </p>
                         )}
 

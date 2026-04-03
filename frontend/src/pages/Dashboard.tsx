@@ -10,7 +10,7 @@ export default function Dashboard() {
     const [vehicles, setVehicles] = useState<Record<string, IGPSData>>({})
     const [liveLog, setLiveLog] = useState<Array<IGPSData & { id: string }>>([])    //  & ==>  intersection type — iki tipi birleştir, websocket'den gelen veride "id" degeri var fakat tanimli olan IGPSData'da id degeri yok !!!
     const navigate = useNavigate()
-    const vehicleList = useVehicles()
+    const vehicleList = useVehicles()           // hook/useVehicles tarafindan return edilen deger !!!
 
     useEffect(() => {
         const socket = new WebSocket('ws://localhost:8080')
@@ -30,7 +30,7 @@ export default function Dashboard() {
 
             <main className="ml-64 flex-1 flex flex-col overflow-y-auto">
                 <header className="h-16 border-b border-[#131b2e] px-8 flex items-center justify-between sticky top-0 bg-[#0b1326]/80 backdrop-blur-md z-50">
-                    <h1 className="text-xl font-bold tracking-tighter text-cyan-500 font-['Space_Grotesk']">OBSIDIAN VELOCITY</h1>
+                    <h1 className="text-xl font-bold tracking-tighter text-cyan-500 font-['Space_Grotesk']">TrackFlow</h1>
                     <div className="flex items-center gap-4 text-xs font-bold uppercase tracking-widest text-emerald-400">
                         <span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span>
                         System: Nominal
@@ -97,7 +97,7 @@ export default function Dashboard() {
                         <div className="p-4 border-b border-white/5">
                             <h3 className="font-bold font-['Space_Grotesk']">Live Map</h3>
                         </div>
-                        <MapContainer center={[39.6484, 27.8826]} zoom={14} style={{ height: '450px', width: '100%' }} zoomControl={true}>
+                        <MapContainer center={[39.0, 35.0]} zoom={6} style={{ height: '450px', width: '100%' }} zoomControl={true}>
                             <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
                             {Object.entries(vehicles).map(([id, vehicle]) => (
                                 <Marker key={id} position={[vehicle.lat, vehicle.long]} />

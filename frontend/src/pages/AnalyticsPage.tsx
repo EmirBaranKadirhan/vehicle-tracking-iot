@@ -6,7 +6,7 @@ import { useVehicles } from '../hooks/useVehicles'
 
 // VEHICLES array kaldırıldı — useVehicles hook'undan geliyor
 
-const DAYS = ['Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt', 'Paz']
+const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
 
 const WEEKLY_ALERTS: Record<string, number[]> = {
     '1': [3, 5, 2, 8, 4, 6, 3],
@@ -31,31 +31,31 @@ const DAILY_STATS: Record<string, Record<number, {
     violations: { type: string; severity: 'critical' | 'warning' | 'info'; count: number }[]
 }>> = {
     '1': {
-        0: { idleHours: 1.2, idleRatio: 15, riskScore: 45, estimatedFuel: 62, speedViolations: 2, offlineCount: 0, efficiency: 85, violations: [{ type: 'Hız İhlali', severity: 'warning', count: 2 }, { type: 'Ani Fren', severity: 'info', count: 1 }] },
-        1: { idleHours: 1.8, idleRatio: 22, riskScore: 72, estimatedFuel: 88, speedViolations: 4, offlineCount: 1, efficiency: 78, violations: [{ type: 'Hız İhlali', severity: 'critical', count: 4 }, { type: 'Offline', severity: 'warning', count: 1 }] },
-        2: { idleHours: 0.8, idleRatio: 10, riskScore: 28, estimatedFuel: 55, speedViolations: 0, offlineCount: 0, efficiency: 90, violations: [{ type: 'Rölanti', severity: 'info', count: 2 }] },
-        3: { idleHours: 2.1, idleRatio: 26, riskScore: 91, estimatedFuel: 110, speedViolations: 6, offlineCount: 1, efficiency: 74, violations: [{ type: 'Hız İhlali', severity: 'critical', count: 6 }, { type: 'Ani Fren', severity: 'warning', count: 2 }] },
-        4: { idleHours: 1.0, idleRatio: 12, riskScore: 40, estimatedFuel: 70, speedViolations: 0, offlineCount: 1, efficiency: 88, violations: [{ type: 'Offline', severity: 'warning', count: 2 }, { type: 'Rölanti', severity: 'info', count: 2 }] },
-        5: { idleHours: 0.9, idleRatio: 11, riskScore: 65, estimatedFuel: 80, speedViolations: 5, offlineCount: 0, efficiency: 89, violations: [{ type: 'Hız İhlali', severity: 'warning', count: 5 }, { type: 'Ani Fren', severity: 'info', count: 1 }] },
-        6: { idleHours: 0.6, idleRatio: 8, riskScore: 20, estimatedFuel: 55, speedViolations: 0, offlineCount: 0, efficiency: 92, violations: [{ type: 'Rölanti', severity: 'info', count: 3 }] },
+        0: { idleHours: 1.2, idleRatio: 15, riskScore: 45, estimatedFuel: 62, speedViolations: 2, offlineCount: 0, efficiency: 85, violations: [{ type: 'Speed Violation', severity: 'warning', count: 2 }, { type: 'Hard Brake', severity: 'info', count: 1 }] },
+        1: { idleHours: 1.8, idleRatio: 22, riskScore: 72, estimatedFuel: 88, speedViolations: 4, offlineCount: 1, efficiency: 78, violations: [{ type: 'Speed Violation', severity: 'critical', count: 4 }, { type: 'Offline', severity: 'warning', count: 1 }] },
+        2: { idleHours: 0.8, idleRatio: 10, riskScore: 28, estimatedFuel: 55, speedViolations: 0, offlineCount: 0, efficiency: 90, violations: [{ type: 'Idle', severity: 'info', count: 2 }] },
+        3: { idleHours: 2.1, idleRatio: 26, riskScore: 91, estimatedFuel: 110, speedViolations: 6, offlineCount: 1, efficiency: 74, violations: [{ type: 'Speed Violation', severity: 'critical', count: 6 }, { type: 'Hard Brake', severity: 'warning', count: 2 }] },
+        4: { idleHours: 1.0, idleRatio: 12, riskScore: 40, estimatedFuel: 70, speedViolations: 0, offlineCount: 1, efficiency: 88, violations: [{ type: 'Offline', severity: 'warning', count: 2 }, { type: 'Idle', severity: 'info', count: 2 }] },
+        5: { idleHours: 0.9, idleRatio: 11, riskScore: 65, estimatedFuel: 80, speedViolations: 5, offlineCount: 0, efficiency: 89, violations: [{ type: 'Speed Violation', severity: 'warning', count: 5 }, { type: 'Hard Brake', severity: 'info', count: 1 }] },
+        6: { idleHours: 0.6, idleRatio: 8, riskScore: 20, estimatedFuel: 55, speedViolations: 0, offlineCount: 0, efficiency: 92, violations: [{ type: 'Idle', severity: 'info', count: 3 }] },
     },
     '2': {
-        0: { idleHours: 0.9, idleRatio: 11, riskScore: 70, estimatedFuel: 75, speedViolations: 5, offlineCount: 1, efficiency: 89, violations: [{ type: 'Hız İhlali', severity: 'critical', count: 5 }, { type: 'Offline', severity: 'warning', count: 1 }] },
-        1: { idleHours: 0.6, idleRatio: 7, riskScore: 35, estimatedFuel: 52, speedViolations: 0, offlineCount: 0, efficiency: 93, violations: [{ type: 'Ani Fren', severity: 'info', count: 4 }] },
-        2: { idleHours: 1.2, idleRatio: 15, riskScore: 68, estimatedFuel: 90, speedViolations: 6, offlineCount: 0, efficiency: 85, violations: [{ type: 'Hız İhlali', severity: 'warning', count: 6 }, { type: 'Rölanti', severity: 'info', count: 1 }] },
-        3: { idleHours: 0.4, idleRatio: 5, riskScore: 22, estimatedFuel: 48, speedViolations: 0, offlineCount: 0, efficiency: 95, violations: [{ type: 'Rölanti', severity: 'info', count: 3 }] },
-        4: { idleHours: 1.5, idleRatio: 19, riskScore: 88, estimatedFuel: 105, speedViolations: 8, offlineCount: 0, efficiency: 81, violations: [{ type: 'Hız İhlali', severity: 'critical', count: 8 }, { type: 'Ani Fren', severity: 'warning', count: 1 }] },
+        0: { idleHours: 0.9, idleRatio: 11, riskScore: 70, estimatedFuel: 75, speedViolations: 5, offlineCount: 1, efficiency: 89, violations: [{ type: 'Speed Violation', severity: 'critical', count: 5 }, { type: 'Offline', severity: 'warning', count: 1 }] },
+        1: { idleHours: 0.6, idleRatio: 7, riskScore: 35, estimatedFuel: 52, speedViolations: 0, offlineCount: 0, efficiency: 93, violations: [{ type: 'Hard Brake', severity: 'info', count: 4 }] },
+        2: { idleHours: 1.2, idleRatio: 15, riskScore: 68, estimatedFuel: 90, speedViolations: 6, offlineCount: 0, efficiency: 85, violations: [{ type: 'Speed Violation', severity: 'warning', count: 6 }, { type: 'Idle', severity: 'info', count: 1 }] },
+        3: { idleHours: 0.4, idleRatio: 5, riskScore: 22, estimatedFuel: 48, speedViolations: 0, offlineCount: 0, efficiency: 95, violations: [{ type: 'Idle', severity: 'info', count: 3 }] },
+        4: { idleHours: 1.5, idleRatio: 19, riskScore: 88, estimatedFuel: 105, speedViolations: 8, offlineCount: 0, efficiency: 81, violations: [{ type: 'Speed Violation', severity: 'critical', count: 8 }, { type: 'Hard Brake', severity: 'warning', count: 1 }] },
         5: { idleHours: 0.3, idleRatio: 4, riskScore: 18, estimatedFuel: 40, speedViolations: 0, offlineCount: 0, efficiency: 96, violations: [{ type: 'Offline', severity: 'warning', count: 2 }] },
-        6: { idleHours: 0.2, idleRatio: 3, riskScore: 42, estimatedFuel: 60, speedViolations: 4, offlineCount: 0, efficiency: 97, violations: [{ type: 'Hız İhlali', severity: 'warning', count: 4 }, { type: 'Rölanti', severity: 'info', count: 1 }] },
+        6: { idleHours: 0.2, idleRatio: 3, riskScore: 42, estimatedFuel: 60, speedViolations: 4, offlineCount: 0, efficiency: 97, violations: [{ type: 'Speed Violation', severity: 'warning', count: 4 }, { type: 'Idle', severity: 'info', count: 1 }] },
     },
     '3': {
-        0: { idleHours: 0.8, idleRatio: 10, riskScore: 18, estimatedFuel: 38, speedViolations: 0, offlineCount: 0, efficiency: 90, violations: [{ type: 'Rölanti', severity: 'info', count: 2 }] },
-        1: { idleHours: 1.0, idleRatio: 13, riskScore: 32, estimatedFuel: 44, speedViolations: 3, offlineCount: 0, efficiency: 87, violations: [{ type: 'Hız İhlali', severity: 'warning', count: 3 }] },
-        2: { idleHours: 1.4, idleRatio: 17, riskScore: 44, estimatedFuel: 50, speedViolations: 0, offlineCount: 1, efficiency: 83, violations: [{ type: 'Offline', severity: 'warning', count: 2 }, { type: 'Ani Fren', severity: 'info', count: 3 }] },
-        3: { idleHours: 0.9, idleRatio: 11, riskScore: 38, estimatedFuel: 47, speedViolations: 4, offlineCount: 0, efficiency: 89, violations: [{ type: 'Hız İhlali', severity: 'warning', count: 4 }] },
-        4: { idleHours: 1.1, idleRatio: 14, riskScore: 25, estimatedFuel: 42, speedViolations: 0, offlineCount: 1, efficiency: 86, violations: [{ type: 'Rölanti', severity: 'info', count: 3 }] },
-        5: { idleHours: 1.0, idleRatio: 13, riskScore: 55, estimatedFuel: 58, speedViolations: 6, offlineCount: 1, efficiency: 87, violations: [{ type: 'Hız İhlali', severity: 'critical', count: 6 }, { type: 'Offline', severity: 'warning', count: 1 }] },
-        6: { idleHours: 0.5, idleRatio: 6, riskScore: 20, estimatedFuel: 31, speedViolations: 0, offlineCount: 0, efficiency: 94, violations: [{ type: 'Ani Fren', severity: 'info', count: 4 }] },
+        0: { idleHours: 0.8, idleRatio: 10, riskScore: 18, estimatedFuel: 38, speedViolations: 0, offlineCount: 0, efficiency: 90, violations: [{ type: 'Idle', severity: 'info', count: 2 }] },
+        1: { idleHours: 1.0, idleRatio: 13, riskScore: 32, estimatedFuel: 44, speedViolations: 3, offlineCount: 0, efficiency: 87, violations: [{ type: 'Speed Violation', severity: 'warning', count: 3 }] },
+        2: { idleHours: 1.4, idleRatio: 17, riskScore: 44, estimatedFuel: 50, speedViolations: 0, offlineCount: 1, efficiency: 83, violations: [{ type: 'Offline', severity: 'warning', count: 2 }, { type: 'Hard Brake', severity: 'info', count: 3 }] },
+        3: { idleHours: 0.9, idleRatio: 11, riskScore: 38, estimatedFuel: 47, speedViolations: 4, offlineCount: 0, efficiency: 89, violations: [{ type: 'Speed Violation', severity: 'warning', count: 4 }] },
+        4: { idleHours: 1.1, idleRatio: 14, riskScore: 25, estimatedFuel: 42, speedViolations: 0, offlineCount: 1, efficiency: 86, violations: [{ type: 'Idle', severity: 'info', count: 3 }] },
+        5: { idleHours: 1.0, idleRatio: 13, riskScore: 55, estimatedFuel: 58, speedViolations: 6, offlineCount: 1, efficiency: 87, violations: [{ type: 'Speed Violation', severity: 'critical', count: 6 }, { type: 'Offline', severity: 'warning', count: 1 }] },
+        6: { idleHours: 0.5, idleRatio: 6, riskScore: 20, estimatedFuel: 31, speedViolations: 0, offlineCount: 0, efficiency: 94, violations: [{ type: 'Hard Brake', severity: 'info', count: 4 }] },
     },
 }
 
@@ -75,12 +75,11 @@ function getRiskBadge(score: number) {
 }
 
 function getIdleLevel(ratio: number, hours: number) {
-    if (ratio >= 20) return { label: 'Kritik', color: '#ff4d6d', bg: 'rgba(255,77,109,0.10)', comment: `Haftada ${hours}s rölantide — motor çalışıyor, araç duruyordu. Rota planlaması gerekli.` }
-    if (ratio >= 12) return { label: 'Yüksek', color: '#ffb873', bg: 'rgba(255,184,115,0.10)', comment: `Haftada ${hours}s boşta bekledi. Sürüş zamanının %${ratio}'i verimsiz geçiyor.` }
-    if (ratio >= 6) return { label: 'Normal', color: '#94de2d', bg: 'rgba(148,222,45,0.10)', comment: `Bekleme süresi kabul edilebilir aralıkta. ${hours}s idle bu araç için normalin altında.` }
-    return { label: 'Düşük', color: '#4cd7f6', bg: 'rgba(76,215,246,0.10)', comment: `Sadece ${hours}s boşta kaldı. Araç verimli kullanılıyor, devam.` }
+    if (ratio >= 20) return { label: 'Critical', color: '#ff4d6d', bg: 'rgba(255,77,109,0.10)', comment: `${hours}h idle this week — engine running, vehicle stationary. Route planning required.` }
+    if (ratio >= 12) return { label: 'High', color: '#ffb873', bg: 'rgba(255,184,115,0.10)', comment: `${hours}h spent idle this week. ${ratio}% of driving time is being wasted.` }
+    if (ratio >= 6) return { label: 'Normal', color: '#94de2d', bg: 'rgba(148,222,45,0.10)', comment: `Wait time is within acceptable range. ${hours}h idle is below average for this vehicle.` }
+    return { label: 'Low', color: '#4cd7f6', bg: 'rgba(76,215,246,0.10)', comment: `Only ${hours}h idle. Vehicle is being used efficiently.` }
 }
-
 const SEV_STYLE = {
     critical: { color: '#ff4d6d', bg: 'rgba(255,77,109,0.12)' },
     warning: { color: '#ffb873', bg: 'rgba(255,184,115,0.12)' },
@@ -125,7 +124,7 @@ function Breadcrumb({ ctx, onNavigate, vehicleList }: {
 
     const crumbs: Crumb[] = [
         {
-            label: 'Filo Geneli',
+            label: 'Fleet Overview',
             onClick: ctx !== null ? () => onNavigate(null) : undefined,
         },
     ]
@@ -217,7 +216,7 @@ function LineChart({ ctx, onVehicleClick, onDayClick, vehicleList }: {
                             strokeWidth="1.5" strokeDasharray="4,3" opacity="0.5" />
                     </svg>
                     <span className="text-[10px] text-slate-500 uppercase tracking-widest font-['Space_Grotesk']">
-                        Önceki Hafta
+                        Previous Week
                     </span>
                 </div>
             </div>
@@ -315,13 +314,13 @@ function ViolationPanel({ ctx, vehicleList }: { ctx: ActiveCtx | null, vehicleLi
             <div className="flex items-center gap-3 mb-4">
                 <span className="material-symbols-outlined text-sm" style={{ color: vehicle.color }}>report</span>
                 <h3 className="font-black font-['Space_Grotesk'] text-sm uppercase tracking-widest">
-                    {DAYS[ctx.dayIndex]} Günü İhlalleri
+                    {DAYS[ctx.dayIndex]} Day Violations
                 </h3>
                 <span className="text-[10px] text-slate-500">— {vehicle.vehicleName}</span>
             </div>
             <div className="flex flex-wrap gap-2">
                 {daily.violations.length === 0
-                    ? <span className="text-[10px] text-slate-600 uppercase tracking-widest">Bu gün ihlal yok</span>
+                    ? <span className="text-[10px] text-slate-600 uppercase tracking-widest">No violations this day</span>
                     : daily.violations.map((v, i) => {
                         const s = SEV_STYLE[v.severity]
                         return (
@@ -356,8 +355,8 @@ function RiskTable({ ctx, onVehicleClick, vehicleAnalytics, vehicleList }: {
             background: 'rgba(23,31,51,0.7)', border: '1px solid rgba(76,215,246,0.08)',
         }}>
             <div className="px-6 py-4 border-b border-white/5 flex justify-between items-center">
-                <h3 className="font-black font-['Space_Grotesk'] text-sm uppercase tracking-widest">Risk Analizi</h3>
-                <span className="text-[10px] text-slate-500 uppercase tracking-widest">haftalık — 100 üz.</span>
+                <h3 className="font-black font-['Space_Grotesk'] text-sm uppercase tracking-widest">Risk Analysis</h3>
+                <span className="text-[10px] text-slate-500 uppercase tracking-widest">weekly — out of 100</span>
             </div>
             <div className="divide-y divide-white/5">
                 {sorted.map(v => {
@@ -391,7 +390,7 @@ function RiskTable({ ctx, onVehicleClick, vehicleAnalytics, vehicleList }: {
                             </div>
                             <div className="flex gap-6 mt-3">
                                 <span className="text-[10px] text-slate-500">
-                                    <span className="text-slate-300 font-bold">{s?.speedViolations ?? 0}</span> hız ihlali
+                                    <span className="text-slate-300 font-bold">{s?.speedViolations ?? 0}</span> speed violations
                                 </span>
                                 <span className="text-[10px] text-slate-500">
                                     <span className="text-slate-300 font-bold">{s?.offlineCount ?? 0}</span> offline
@@ -420,10 +419,10 @@ function IdleAnalysis({ ctx, onVehicleClick, vehicleList }: {
             background: 'rgba(23,31,51,0.7)', border: '1px solid rgba(76,215,246,0.08)',
         }}>
             <div className="mb-6">
-                <h3 className="font-black font-['Space_Grotesk'] text-sm uppercase tracking-widest">Idle Analizi</h3>
+                <h3 className="font-black font-['Space_Grotesk'] text-sm uppercase tracking-widest">Idle Analysis</h3>
                 <p className="text-[11px] text-slate-500 mt-1 leading-relaxed">
-                    Araç çalışıyor ama hareket etmiyor — bu süre yakıt tüketir, verimlilik düşürür.
-                    Yüksek idle oranı rota optimizasyonu gerektiğine işaret eder.
+                    Vehicle is running but not moving — this burns fuel and reduces efficiency.
+                    High idle ratio signals the need for route optimization.
                 </p>
             </div>
 
@@ -489,15 +488,15 @@ function IdleAnalysis({ ctx, onVehicleClick, vehicleList }: {
 
             <div className="mt-6 pt-6 border-t border-white/5 grid grid-cols-3 gap-4 text-center">
                 <div>
-                    <p className="text-[10px] text-slate-500 uppercase tracking-widest mb-1">Toplam Idle</p>
+                    <p className="text-[10px] text-slate-500 uppercase tracking-widest mb-1">Total Idle</p>
                     <p className="font-black font-['Space_Grotesk'] text-cyan-400">{summary.idleHours}s</p>
                 </div>
                 <div>
-                    <p className="text-[10px] text-slate-500 uppercase tracking-widest mb-1">Ort. Oran</p>
+                    <p className="text-[10px] text-slate-500 uppercase tracking-widest mb-1">Avg. Ratio</p>
                     <p className="font-black font-['Space_Grotesk'] text-orange-400">{summary.idleRatio}%</p>
                 </div>
                 <div>
-                    <p className="text-[10px] text-slate-500 uppercase tracking-widest mb-1">Verimlilik</p>
+                    <p className="text-[10px] text-slate-500 uppercase tracking-widest mb-1">Efficiency</p>
                     <p className="font-black font-['Space_Grotesk'] text-lime-400">{summary.efficiency}%</p>
                 </div>
             </div>
@@ -555,17 +554,17 @@ export default function AnalyticsPage() {
                     <h2 className="text-4xl font-black font-['Space_Grotesk'] tracking-tight">Fleet Analytics</h2>
                     <Breadcrumb ctx={ctx} onNavigate={setCtx} vehicleList={vehicleList} />
                     <p className="text-slate-500 text-xs">
-                        {!ctx && "Legend'dan araç seç · Grafikte noktaya tıkla → o günün detayı"}
-                        {ctx && !isDay && 'Grafikte bir noktaya tıkla → kartlar o günün verisini gösterir'}
-                        {ctx && isDay && `Kartlar ${DAYS[ctx.dayIndex!]} verisi · Aynı noktaya tekrar tıkla → günü kaldır`}
+                        {!ctx && "Select a vehicle from the legend · Click a point on the chart → view that day"}
+                        {ctx && !isDay && 'Click a point on the chart → cards will show that day\'s data'}
+                        {ctx && isDay && `Cards show ${DAYS[ctx.dayIndex!]} data  · Click the same point again → deselect day`}
                     </p>
                 </div>
 
                 <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-                    <StatCard label="Idle Ratio" value={`${stats.idleRatio}%`} sub={`${stats.idleHours}s boşta`} color="#4cd7f6" icon="timer" highlight={isDay} />
-                    <StatCard label="Risk Skoru" value={`${stats.riskScore}`} sub={`${stats.speedViolations} hız ihl.`} color="#ff4d6d" icon="warning" highlight={isDay} />
-                    <StatCard label="Tahmini Yakıt" value={`${stats.estimatedFuel}L`} sub="tüketim tahmini" color="#ffb873" icon="local_gas_station" highlight={isDay} />
-                    <StatCard label="Verimlilik" value={`${stats.efficiency}%`} sub={`${stats.offlineCount} offline`} color="#94de2d" icon="speed" highlight={isDay} />
+                    <StatCard label="Idle Ratio" value={`${stats.idleRatio}%`} sub={`${stats.idleHours}s idle`} color="#4cd7f6" icon="timer" highlight={isDay} />
+                    <StatCard label="Risk Score" value={`${stats.riskScore}`} sub={`${stats.speedViolations} speed viol.`} color="#ff4d6d" icon="warning" highlight={isDay} />
+                    <StatCard label="Est. Fuel" value={`${stats.estimatedFuel}L`} sub="estimated consumption" color="#ffb873" icon="local_gas_station" highlight={isDay} />
+                    <StatCard label="Efficiency" value={`${stats.efficiency}%`} sub={`${stats.offlineCount} offline`} color="#94de2d" icon="speed" highlight={isDay} />
                 </div>
 
                 <div className="p-6 rounded-2xl" style={{
@@ -575,9 +574,9 @@ export default function AnalyticsPage() {
                     borderLeft: '1px solid rgba(76,215,246,0.08)',
                 }}>
                     <div className="mb-4">
-                        <h3 className="font-black font-['Space_Grotesk'] text-lg">Haftalık Alert Trendi</h3>
+                        <h3 className="font-black font-['Space_Grotesk'] text-lg">Weekly Alert Trend</h3>
                         <p className="text-[10px] text-slate-500 uppercase tracking-widest mt-1">
-                            Noktaya tıkla → o günün verisini kartlarda görüntüle
+                            Click a point → view that day\'s data in the cards
                         </p>
                     </div>
                     <LineChart ctx={ctx} onVehicleClick={handleVehicleClick} onDayClick={handleDayClick} vehicleList={vehicleList} />
