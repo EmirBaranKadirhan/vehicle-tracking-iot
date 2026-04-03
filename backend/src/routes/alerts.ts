@@ -17,8 +17,9 @@ router.get("/alerts", async (req, res) => {
         if (type) {
             query.type = type
         }
+
         const pageNumber = Number(page) || 1
-        const limitNumber = Number(limit) || 10
+        const limitNumber = Number(limit) || 5
         const offset = (pageNumber - 1) * limitNumber;
         const response = await Alert.find(query).sort({ createdAt: -1 }).skip(offset).limit(limitNumber)
         const total = await Alert.countDocuments(query)
