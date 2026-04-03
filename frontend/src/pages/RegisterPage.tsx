@@ -12,7 +12,7 @@ export default function RegisterPage() {
 
     let navigate = useNavigate();
 
-    const handleSubmit = async (event) => {
+    const handleSubmit = async (event: any) => {
 
         try {
             event.preventDefault();
@@ -38,24 +38,10 @@ export default function RegisterPage() {
             <header className="fixed top-0 w-full z-50 flex justify-between items-center px-8 h-20 bg-[#0b1326] border-b border-white/5 shadow-2xl shadow-cyan-900/10">
                 <div className="flex items-center gap-4">
                     <span className="text-2xl font-bold tracking-tighter text-cyan-400 uppercase">
-                        Obsidian Velocity
+                        TrackFlow
                     </span>
                 </div>
 
-                <div className="flex items-center gap-6">
-                    <button
-                        type="button"
-                        className="material-symbols-outlined text-slate-400 hover:bg-white/5 transition-all duration-300 p-2 rounded-full"
-                    >
-                        help
-                    </button>
-                    <button
-                        type="button"
-                        className="material-symbols-outlined text-slate-400 hover:bg-white/5 transition-all duration-300 p-2 rounded-full"
-                    >
-                        settings
-                    </button>
-                </div>
             </header>
 
             <main className="flex-grow relative flex items-center justify-center pt-20 pb-24 overflow-hidden">
@@ -77,19 +63,20 @@ export default function RegisterPage() {
                     <div className="hidden lg:flex flex-col space-y-8">
                         <div className="space-y-4">
                             <img
-                                src="https://lh3.googleusercontent.com/aida-public/AB6AXuDOGvmOeur1bUahgZCsMrOmXuD9IvQd4IF9VBO7H657ak7lcYOSw6k-Ixi36QyTmFzPgV4X_xMidUUYba6L37wnhil_DLb5kDedU8hTzxEyXzQ-G8K4hPMc-KQqTIzS7hVke-h2N9YCUXNGwhIbVyt1IR02ZQUVg-1LdJPwf-6vXnc3LEU6I5WCX4bxShy-WiIltfq2T_LXF2LeVOmNgsBL68B9DIhmFi4fVt3DOv0dc8l7H9eU-zkixJEvAtEYol3EDNhMIfPYp5kL"
+                                src="/TrackFlowLogo.png"
                                 alt="Obsidian Velocity emblem"
-                                className="w-24 h-24 object-contain mb-4"
+                                className="w-48 h-48 object-contain mb-4"
                             />
 
                             <h1 className="text-5xl font-bold leading-tight tracking-tight">
-                                Hızın ve Verinin <span className="text-cyan-400">Kinetik</span>{" "}
-                                Uyumu
+                                <span className="text-cyan-400">The Kinetic</span>{" "}
+                                Harmony of Speed and Data
                             </h1>
 
                             <p className="text-slate-400 text-lg max-w-md leading-relaxed">
-                                Araç telemetrisinde yeni nesil zeka. Obsidian Velocity ile
-                                filonuzu gerçek zamanlı havacılık hassasiyetiyle yönetin.
+                                Next-generation intelligence for vehicle tracking.
+                                Monitor your fleet in real-time with IoT-powered precision — speed, location, and alerts,
+                                all in one place.
                             </p>
                         </div>
 
@@ -98,9 +85,9 @@ export default function RegisterPage() {
                                 <span className="material-symbols-outlined text-lime-400 mb-3">
                                     speed
                                 </span>
-                                <h3 className="font-semibold">Canlı Telemetri</h3>
+                                <h3 className="font-semibold">Live Telemetry</h3>
                                 <p className="text-sm text-slate-400">
-                                    Anlık hız ve motor verileri.
+                                    Real-time speed and engine data.
                                 </p>
                             </div>
 
@@ -108,15 +95,14 @@ export default function RegisterPage() {
                                 <span className="material-symbols-outlined text-cyan-400 mb-3">
                                     location_on
                                 </span>
-                                <h3 className="font-semibold">Hassas Takip</h3>
+                                <h3 className="font-semibold">Precise Tracking</h3>
                                 <p className="text-sm text-slate-400">
-                                    Sıfır gecikmeli GPS izleme.
+                                    Zero-latency GPS tracking.
                                 </p>
                             </div>
                         </div>
                     </div>
 
-                    {/* Sağ Taraf - Kayıt Kartı */}
                     <div
                         className="p-10 lg:p-12 rounded-2xl shadow-2xl"
                         style={{
@@ -128,18 +114,17 @@ export default function RegisterPage() {
                     >
                         <div className="mb-10 text-center lg:text-left">
                             <h2 className="text-3xl font-bold mb-2 tracking-tight">
-                                Kayıt Ol
+                                Register
                             </h2>
                             <p className="text-slate-400 uppercase text-[10px] tracking-widest font-bold">
-                                Velocity Akıllı Sistemine Katıl
+                                Join the TrackFlow Platform
                             </p>
                         </div>
 
                         <form onSubmit={handleSubmit} className="space-y-6">
-                            {/* Kullanıcı Adı */}
                             <div className="space-y-2">
                                 <label className="text-[11px] uppercase tracking-wider text-slate-400 font-bold ml-1">
-                                    Kullanıcı Adı
+                                    Username
                                 </label>
                                 <div className="relative group">
                                     <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-cyan-400 transition-colors">
@@ -147,7 +132,7 @@ export default function RegisterPage() {
                                     </span>
                                     <input
                                         type="text"
-                                        placeholder="Kullanıcı adınızı girin"
+                                        placeholder="Enter your username"
                                         className="w-full bg-[#2d3449]/50 border border-slate-700 rounded-lg py-4 pl-12 pr-4 text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-cyan-400/20 focus:border-cyan-400 transition-all"
                                         value={username}
                                         onChange={(e) => setUsername(e.target.value)}
@@ -155,10 +140,10 @@ export default function RegisterPage() {
                                 </div>
                             </div>
 
-                            {/* Email */}
+
                             <div className="space-y-2">
                                 <label className="text-[11px] uppercase tracking-wider text-slate-400 font-bold ml-1">
-                                    E-posta Adresi
+                                    Email Address
                                 </label>
                                 <div className="relative group">
                                     <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-cyan-400 transition-colors">
@@ -166,7 +151,7 @@ export default function RegisterPage() {
                                     </span>
                                     <input
                                         type="email"
-                                        placeholder="example@obsidian.com"
+                                        placeholder="user@trackflow.com"
                                         className="w-full bg-[#2d3449]/50 border border-slate-700 rounded-lg py-4 pl-12 pr-4 text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-cyan-400/20 focus:border-cyan-400 transition-all"
                                         value={email}
                                         onChange={(e) => setEmail(e.target.value)}
@@ -174,10 +159,10 @@ export default function RegisterPage() {
                                 </div>
                             </div>
 
-                            {/* Şifre */}
+
                             <div className="space-y-2">
                                 <label className="text-[11px] uppercase tracking-wider text-slate-400 font-bold ml-1">
-                                    Şifre
+                                    Password
                                 </label>
                                 <div className="relative group">
                                     <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-cyan-400 transition-colors">
@@ -200,13 +185,12 @@ export default function RegisterPage() {
                                 </div>
                             </div>
 
-                            {/* Submit */}
                             <div className="pt-4">
                                 <button
                                     type="submit"
                                     className="w-full bg-cyan-500 text-[#003640] font-bold py-4 rounded-xl shadow-lg shadow-cyan-500/20 hover:bg-cyan-400 transition-all active:scale-95 flex items-center justify-center gap-2 group"
                                 >
-                                    Kayıt Ol
+                                    Register
                                     <span className="material-symbols-outlined group-hover:translate-x-1 transition-transform">
                                         arrow_forward
                                     </span>
@@ -216,54 +200,29 @@ export default function RegisterPage() {
                                 <p className="text-red-400 text-xs text-center mt-2">{errorMessage}</p>
                             )}
 
-                            {/* Alt Link */}
                             <div className="pt-6 text-center">
                                 <p className="text-sm text-slate-400">
-                                    Zaten hesabınız var mı?
+                                    Already have an account?
 
                                     <Link to="/login" className="text-cyan-400 font-bold hover:underline underline-offset-4 ml-1">
-                                        Giriş Yap
+                                        Sign In
                                     </Link>
                                 </p>
                             </div>
                         </form>
 
-                        {/* Alt Bilgi */}
                         <div className="mt-12 flex items-center justify-between border-t border-slate-700/30 pt-6 opacity-60">
                             <div className="flex items-center gap-2">
                                 <span className="w-2 h-2 rounded-full bg-lime-400"></span>
                                 <span className="text-[10px] uppercase font-bold tracking-tighter">
-                                    Sistem Durumu: Aktif
+                                    System Status: Active
                                 </span>
                             </div>
-                            <span className="text-[10px] uppercase font-bold tracking-tighter">
-                                Veri Şifreleme: AES-256
-                            </span>
                         </div>
                     </div>
                 </div>
             </main>
 
-            {/* Footer */}
-            <footer className="fixed bottom-0 w-full flex justify-between items-center px-10 py-6 bg-[#060e20] border-t border-white/5 text-[11px] uppercase tracking-[0.05em] text-slate-500">
-                <div className="flex items-center gap-6">
-                    <span className="text-cyan-500 opacity-80">
-                        © 2024 Obsidian Velocity. Kinetic Intelligence Systems.
-                    </span>
-                </div>
-
-                <div className="flex gap-8">
-                    <a href="#" className="hover:text-cyan-400 transition-colors">
-                        Privacy Policy
-                    </a>
-                    <a href="#" className="hover:text-cyan-400 transition-colors">
-                        Terms of Service
-                    </a>
-                    <a href="#" className="hover:text-cyan-400 transition-colors">
-                        System Status
-                    </a>
-                </div>
-            </footer>
         </div>
     );
 }
