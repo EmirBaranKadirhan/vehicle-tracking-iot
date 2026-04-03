@@ -33,7 +33,7 @@ const startSimulator = async () => {
 
     for (let i = 0; i < dbVehicles.length; i++) {
         const vehicle: any = dbVehicles[i]
-        const defaultPosition: any = DEFAULT_POSITIONS[i]
+        const defaultPosition: any = DEFAULT_POSITIONS[i % DEFAULT_POSITIONS.length]
 
         vehicles.push({
             id: vehicle.vehicleId,
