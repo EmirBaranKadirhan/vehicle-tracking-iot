@@ -45,7 +45,7 @@ export default function Sidebar({ vehicles = {} }: SidebarProps) {
                     <span className="material-symbols-outlined text-cyan-400">local_shipping</span>
                 </div>
                 <div>
-                    <h3 className="text-lg font-black font-['Space_Grotesk'] leading-tight">Fleet Alpha</h3>
+                    <h3 className="text-lg font-black font-['Space_Grotesk'] leading-tight">TrackFlow</h3>
                     <p className="text-[10px] text-slate-400 tracking-widest uppercase">{Object.keys(vehicles).length} Active Units</p>
                 </div>
             </div>
@@ -76,6 +76,7 @@ export default function Sidebar({ vehicles = {} }: SidebarProps) {
                 <NavItem icon="history" label="Historical" active={location.pathname === '/historical'} onClick={() => navigate('/historical')} />
                 <NavItem icon="warning" label="Alerts" active={location.pathname === '/alerts'} onClick={() => navigate('/alerts')} />
                 <NavItem icon="analytics" label="Analytics" active={location.pathname === '/analytics'} onClick={() => navigate('/analytics')} />
+                <NavItem icon="directions_car" label="Vehicles" active={location.pathname === '/vehicles'} onClick={() => navigate('/vehicles')} />
             </nav>
 
             {/* Logout */}
