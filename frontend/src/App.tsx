@@ -6,6 +6,7 @@ import LoginPage from "./pages/LoginPage"
 import ProtectedRoute from "./components/ProtectedRoute"
 import AlertsPage from "./pages/AlertsPage"
 import AnalyticsPage from "./pages/AnalyticsPage"
+import VehicleManagement from "./pages/VehicleManagement"
 
 
 export default function App() {
@@ -16,6 +17,7 @@ export default function App() {
         <Route path="/historical" element={<HistoryPage />} />
         <Route path="/alerts" element={<AlertsPage />} />
         <Route path="/analytics" element={<AnalyticsPage />} />
+        <Route path="/vehicles" element={<VehicleManagement />} />
       </Route>
       <Route path="/register" element={<RegisterPage />} />
       <Route path="/login" element={<LoginPage />} />
