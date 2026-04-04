@@ -8,7 +8,19 @@ A full-stack IoT vehicle tracking system that processes simulated GPS data over 
 
 ## 📸 Screenshots
 
-> *(Add screenshots here)*
+![Register](pictures/uygulamaIciResim1.png)
+
+![Login](pictures/uygulamaIciResim2.png)
+
+![Dashboard](pictures/uygulamaIciResim3.gif)
+
+![History](pictures/uygulamaIciResim4.png)
+
+![Alerts](pictures/uygulamaIciResim5.gif)
+
+![Analytics](pictures/uygulamaIciResim6.png)
+
+![Vehicles](pictures/uygulamaIciResim7.png)
 
 ---
 
