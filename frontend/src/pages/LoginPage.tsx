@@ -72,7 +72,7 @@ export default function LoginPage() {
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
                                     className="w-full bg-[#131b2e] border-0 border-b border-slate-700 focus:ring-0 focus:border-cyan-400 focus:bg-[#2d3449] transition-all pl-10 pr-4 py-3 text-sm text-white placeholder:text-slate-500 outline-none"
-                                    placeholder="kullanici@obsidian.com"
+                                    placeholder="user@trackflow.com"
                                 />
                             </div>
                         </div>

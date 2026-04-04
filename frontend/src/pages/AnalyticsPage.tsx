@@ -80,6 +80,8 @@ function getIdleLevel(ratio: number, hours: number) {
     if (ratio >= 6) return { label: 'Normal', color: '#94de2d', bg: 'rgba(148,222,45,0.10)', comment: `Wait time is within acceptable range. ${hours}h idle is below average for this vehicle.` }
     return { label: 'Low', color: '#4cd7f6', bg: 'rgba(76,215,246,0.10)', comment: `Only ${hours}h idle. Vehicle is being used efficiently.` }
 }
+
+
 const SEV_STYLE = {
     critical: { color: '#ff4d6d', bg: 'rgba(255,77,109,0.12)' },
     warning: { color: '#ffb873', bg: 'rgba(255,184,115,0.12)' },

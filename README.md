@@ -136,58 +136,40 @@ vehicle-tracking-iot/
 
 - Node.js v18+
 - MongoDB (local or Atlas)
-- Redis (local or cloud)
+- Redis (running locally on default port 6379)
 - Groq API Key → [console.groq.com](https://console.groq.com)
 
 ### Backend
 
-```bash
-cd backend
-npm install
-```
-
 Create a `.env` file inside `backend/`:
-
 ```env
 PORT=5000
 MONGODB_URI=your_mongodb_connection_string
 JWT_SECRET_KEY=your_jwt_secret
 GROQ_API_KEY=your_groq_api_key
 ```
-
-Start the server:
-
 ```bash
-npx tsx src/server.ts
+cd backend
+npm install
+npm run dev
 ```
 
-Start the MQTT broker (required before simulator):
-
-```bash
-# broker starts automatically with server.ts
-```
-
-Start the GPS simulator:
-
+In a separate terminal, start the simulator:
 ```bash
 npx tsx src/simulator.ts
 ```
 
 ### Frontend
 
+Create a `.env` file inside `frontend/`:
+```env
+VITE_API_URL=http://localhost:5000
+```
 ```bash
 cd frontend
 npm install
 npm run dev
 ```
-
-Create a `.env` file inside `frontend/`:
-
-```env
-VITE_API_URL=http://localhost:5000
-```
-
----
 
 ## 🔐 API Endpoints
 
