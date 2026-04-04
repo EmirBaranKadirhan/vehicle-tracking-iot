@@ -51,10 +51,7 @@ A full-stack IoT vehicle tracking system that processes simulated GPS data over 
 | Messaging | MQTT (Aedes broker), mqtt.js |
 | Real-time | WebSocket (ws) |
 | Auth | JWT, bcrypt |
-| AI | Groq API (llama-3.1-8b-instant) |
-| Validation | Zod |
-| Deploy | Vercel (Frontend), Render (Backend), MongoDB Atlas |
-
+| AI | Groq SDK (openai/gpt-oss-20b) |
 ---
 
 ## 🏗️ Architecture
@@ -154,8 +151,7 @@ Create a `.env` file inside `backend/`:
 ```env
 PORT=5000
 MONGODB_URI=your_mongodb_connection_string
-JWT_SECRET=your_jwt_secret
-REDIS_URL=your_redis_url
+JWT_SECRET_KEY=your_jwt_secret
 GROQ_API_KEY=your_groq_api_key
 ```
 
