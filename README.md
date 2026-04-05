@@ -29,7 +29,7 @@ A full-stack IoT vehicle tracking system that processes simulated GPS data over 
 - 🗺️ **Real-time Dashboard** — Live GPS tracking with Leaflet map, speed gauge, altitude and heading telemetry via WebSocket
 - 🚨 **Smart Alert System** — Detects speed violations, offline events, and idle states with cooldown mechanisms to prevent alert spam
 - 📋 **Alert Management** — Filterable, paginated alert list with severity analytics and type distribution
-- 🤖 **AI Fleet Analysis** — Groq API (Llama 3.1) powered fleet insights, persisted in localStorage between sessions
+- 🤖 **AI Fleet Analysis** — Groq API (openai/gpt-oss-20b) powered fleet insights, persisted in localStorage between sessions
 - 📍 **Location History** — Timeline view of historical GPS records with per-vehicle Leaflet map and route polylines
 - 📊 **Analytics** — Risk scoring per vehicle using MongoDB aggregation, with speed violation and offline counts
 - 🚗 **Vehicle Management** — Add and delete vehicles per user account
